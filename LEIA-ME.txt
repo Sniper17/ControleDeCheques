@@ -1,0 +1,58 @@
+CONTROLE DE CHEQUES - PROJETO ANDROID
+
+O QUE ESTE PACOTE CONTEM
+- Projeto-fonte Android (Java + WebView).
+- Interface em portugues, adaptada para celular.
+- Funciona sem internet depois de instalado.
+- Configuracoes e historico gravados localmente no aparelho, sem senha.
+
+COMO GERAR O APK DE TESTE
+1. Em um computador, instale o Android Studio e o Android SDK Platform 35.
+2. Abra a pasta ControleDeCheques no Android Studio.
+3. Aguarde a sincronizacao do Gradle. Na primeira vez, e necessario internet para baixar o plugin e dependencias.
+4. Se o Android Studio solicitar, instale o Android SDK Platform 35 e aceite as licencas.
+5. Selecione Build > Build Bundle(s) / APK(s) > Build APK(s).
+6. O APK de depuracao deve aparecer em app/build/outputs/apk/debug/app-debug.apk.
+7. Copie o APK para o Android, abra-o e autorize a instalacao desta fonte quando o sistema solicitar.
+
+REQUISITOS DO PROJETO
+- Android Studio com suporte ao Android Gradle Plugin 8.7.3.
+- Gradle 8.9 ou versao compativel gerenciada pelo Android Studio.
+- JDK 17 ou superior compativel com a versao do Android Gradle Plugin.
+- Android SDK Platform 35.
+
+CONFIGURACAO INICIAL
+- Taxa mensal de desconto: 3,23% (unica taxa; nao existe taxa bancaria adicional separada).
+- Envelope/TAC fixa: R$ 50,00 por operacao.
+- IOF diario: 0,0082% ao dia.
+- IOF adicional: 0,3800%.
+- Custodia/TAC percentual: 0% (editavel).
+- Dias corridos por padrao, com opcao de dias uteis.
+- Ate 30 cheques por operacao.
+
+FORMULAS IMPLEMENTADAS NESTA VERSAO INICIAL
+- Juros simples proporcionais: valor nominal x (taxa mensal / 100) x (dias / 30).
+- IOF diario: valor nominal x (aliquota diaria / 100) x dias.
+- IOF adicional: valor nominal x (aliquota adicional / 100).
+- Custodia percentual: valor nominal x (aliquota de custodia / 100).
+- Envelope: valor fixo cobrado uma vez por operacao com cheques preenchidos.
+- Valor liquido: soma dos cheques menos juros, IOF, custodia e envelope.
+
+IMPORTANTE: as formulas acima sao uma primeira implementacao baseada nos parametros informados na conversa, nao uma validacao da regra do banco. O IOF pode ter regras, limites e bases de calculo especificos. Antes de usar em operacoes reais, compare alguns exemplos com a planilha oficial e ajuste as formulas se necessario.
+
+STATUS DE TESTE
+- Sintaxe do JavaScript da interface verificada com Node.js (node --check).
+- Nao foi possivel compilar ou executar o aplicativo Android neste ambiente: Android SDK, Gradle e Android Studio nao estao instalados aqui.
+- Portanto, este arquivo e o projeto-fonte, nao um APK pronto. A compilacao final e o teste em aparelho precisam ser feitos no Android Studio.
+
+GERAR O APK PELO CELULAR (SEM COMPUTADOR)
+Este pacote inclui um fluxo de compilacao em nuvem pelo GitHub Actions.
+1. No Android, entre em https://github.com e crie uma conta ou faca login.
+2. No GitHub, crie um repositorio novo chamado ControleDeCheques. Pode ser privado.
+3. Envie todos os arquivos e pastas que estao dentro da pasta ControleDeCheques deste ZIP para a raiz do repositorio. Inclua a pasta oculta .github/workflows.
+4. Abra a aba Actions do repositorio e selecione "Gerar APK Android".
+5. Toque em "Run workflow" e confirme em "Run workflow".
+6. Quando a execucao terminar com sucesso, abra a execucao e baixe o artefato "ControleDeCheques-APK-debug".
+7. Extraia o ZIP do artefato no celular e toque em app-debug.apk para instalar. Se o Android pedir, permita instalar apps desta fonte.
+
+Observacao: a compilacao acontece nos servidores do GitHub; nao exige Android Studio no celular. A conta GitHub e acoes necessarias no site exigem autorizacao do usuario. O APK so existira depois de uma execucao concluida com sucesso.

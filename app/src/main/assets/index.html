@@ -198,22 +198,35 @@ function cancelEdit(){
 
 async function shareOperation(o){
  if(!o)return;
- // Compartilhamento enxuto: somente data, valor e desconto, com quebras reais.
- const blocks=(o.cheques||[]).map(c=>{
-  const d=chequeBreakdownForSavedOperation(o,c);
-  return [
-   'Data: '+(c.due?br(c.due):'Sem data'),
-   'Valor: '+money(c.amount),
-   'Desconto: '+money(d.total)
-  ].join('\\n');
+ const lines=[
+  'CÁLCULO DE CHEQUES',
+  '',
+  'Data: '+(o.date?br(o.date):'-'),
+  '',
+  'Total dos cheques: '+money(o.face),
+  '',
+  'Descontos: '+money(o.discounts),
+  '',
+  'Valor líquido: '+money(o.net),
+  '',
+  'CHEQUES:',
+ ];
+ (o.cheques||[]).forEach((c,i)=>{
+  const due=c.due?br(c.due):'Sem data';
+  const amount=money(c.amount);
+  lines.push((i+1)+'. '+due+' — '+amount);
+  lines.push('');
  });
- const message=blocks.join('\\n\\n');
+ const message=lines.join('\n');
  try{
   if(navigator.share){await navigator.share({text:message});return;}
  }catch(e){if(e&&e.name==='AbortError')return;}
  const url='https://wa.me/?text='+encodeURIComponent(message);
- if(window.Android&&typeof Android.shareText==='function'){Android.shareText(message);}
- else{window.open(url,'_blank');}
+ if(window.Android&&typeof Android.shareText==='function'){
+  Android.shareText(message);
+ }else{
+  window.open(url,'_blank');
+ }
 }
 
 function askConfirm(msg,label){return new Promise(res=>{let ov=$('confirmOverlay'),ok=$('confirmAccept'),no=$('confirmCancel');$('confirmMessage').textContent=msg;ok.textContent=label||'Confirmar';ov.classList.add('show');const end=v=>{ov.classList.remove('show');ok.onclick=no.onclick=null;res(v)};ok.onclick=()=>end(true);no.onclick=()=>end(false)})}

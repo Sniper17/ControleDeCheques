@@ -89,7 +89,7 @@ function daysBetween(a,b,mode=settings.dayMode){let s=utc(a),e=utc(b);if(e<=s)re
 function parseDueDate(v){let m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec((v||'').trim());if(!m)return '';let day=+m[1],mo=+m[2],y=+m[3],d=new Date(Date.UTC(y,mo-1,day));return y>=2000&&d.getUTCFullYear()===y&&d.getUTCMonth()===mo-1&&d.getUTCDate()===day?`${y}-${m[2]}-${m[1]}`:''}
 function loadSettings(){$('rate').value=fmt(settings.rate);$('tac').value=fmt(settings.tac);$('iofDaily').value=fmt(settings.iofDaily);$('iofExtra').value=fmt(settings.iofExtra);$('bankRate').value=fmt(settings.bankRate);$('dayMode').value=settings.dayMode;$('adjust').value=settings.adjust?'1':'0'}
 function saveSettings(){Object.assign(settings,{rate:dec($('rate').value),tac:dec($('tac').value),iofDaily:dec($('iofDaily').value),iofExtra:dec($('iofExtra').value),bankRate:dec($('bankRate').value),dayMode:$('dayMode').value,adjust:$('adjust').value==='1'});store('cc_settings',settings)?toast('Taxas salvas.'):toast('Não foi possível salvar. Verifique o espaço do aparelho.');calculate()}
-function addRow(date='',value='',ref=''){if($('rows').children.length>=30)return toast('Limite de 30 cheques.');let e=document.createElement('div');e.className='cheque';let dd=/^\d{4}-\d{2}-\d{2}$/.test(date)?br(date):date;e.innerHTML=`<div class="cheque-head"><span>Cheque</span><button class="remove">Remover</button></div><div class="grid"><div class="field"><label>Vencimento</label><input class="due" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off" value="${esc(dd)}"></div><div class="field"><label>Valor (R$)</label><input class="amount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" value="${esc(value?fmt(value):'')}"></div></div><div class="field" style="margin-top:10px"><label>Emitente ou nº do cheque (opcional)</label><input class="ref" type="text" maxlength="40" value="${esc(ref)}"></div><div class="muted calcLine">Informe os dados para calcular.</div>`;e.querySelector('.remove').onclick=()=>{e.remove();renumber();calculate()};let di=e.querySelector('.due');di.oninput=()=>{let g=di.value.replace(/\D/g,'').slice(0,8);di.value=g.replace(/^(\d{2})(\d)/,'$1/$2').replace(/^(\d{2})\/(\d{2})(\d)/,'$1/$2/$3');calculate()};e.querySelector('.amount').oninput=calculate;$('rows').appendChild(e);renumber();calculate()}
+function addRow(date='',value=''){if($('rows').children.length>=30)return toast('Limite de 30 cheques.');let e=document.createElement('div');e.className='cheque';let dd=/^\d{4}-\d{2}-\d{2}$/.test(date)?br(date):date;e.innerHTML=`<div class="cheque-head"><span>Cheque</span><button class="remove">Remover</button></div><div class="grid"><div class="field"><label>Vencimento</label><input class="due" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off" value="${esc(dd)}"></div><div class="field"><label>Valor (R$)</label><input class="amount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" value="${esc(value?fmt(value):'')}"></div></div><div class="muted calcLine">Informe os dados para calcular.</div>`;e.querySelector('.remove').onclick=()=>{e.remove();renumber();calculate()};let di=e.querySelector('.due');di.oninput=()=>{let g=di.value.replace(/\D/g,'').slice(0,8);di.value=g.replace(/^(\d{2})(\d)/,'$1/$2').replace(/^(\d{2})\/(\d{2})(\d)/,'$1/$2/$3');calculate()};e.querySelector('.amount').oninput=calculate;$('rows').appendChild(e);renumber();calculate()}
 function renumber(){[...$('rows').children].forEach((e,i)=>e.querySelector('.cheque-head span').textContent='Cheque '+(i+1))}
 function calculate(){
  let t={face:0,interest:0,daily:0,extra:0,bank:0,days:0,wd:0},bad=0,S=settings,td=today(),chequeBreakdowns=[];
@@ -126,7 +126,7 @@ function saveOp(){
  let c=calculate();if(!c.t.face)return toast('Informe o valor de pelo menos um cheque.');if(c.bad)return toast('Corrija as datas dos cheques antes de salvar.');
  let previous=editingOperationId?ops.find(o=>String(o.id)===String(editingOperationId)):null;
  if(editingOperationId&&!previous){editingOperationId=null;return toast('A operação original não foi encontrada.')}
- let cheques=[...$('rows').children].map((e,i)=>{let d=c.cheques.find(x=>x.rowIndex===i);return{due:parseDueDate(e.querySelector('.due').value),amount:num(e.querySelector('.amount').value),ref:e.querySelector('.ref').value.trim(),status:previous?.cheques?.[i]?.status||'aberto',breakdown:d?{days:d.days,monthly:d.interest,iofDaily:d.daily,iofAdditional:d.extra,bank:d.bank,total:r2(d.interest+d.daily+d.extra+d.bank),net:r2(d.amount-d.interest-d.daily-d.extra-d.bank)}:null}}).filter(x=>x.amount>0);
+ let cheques=[...$('rows').children].map((e,i)=>{let d=c.cheques.find(x=>x.rowIndex===i);return{due:parseDueDate(e.querySelector('.due').value),amount:num(e.querySelector('.amount').value),status:previous?.cheques?.[i]?.status||'aberto',breakdown:d?{days:d.days,monthly:d.interest,iofDaily:d.daily,iofAdditional:d.extra,bank:d.bank,total:r2(d.interest+d.daily+d.extra+d.bank),net:r2(d.amount-d.interest-d.daily-d.extra-d.bank)}:null}}).filter(x=>x.amount>0);
  let {pin,...cfg}=settings;
  let updated={id:previous?previous.id:Date.now(),date:previous?.date||today(),client:$('client').value.trim(),cheques,settings:cfg,face:r2(c.t.face),interest:r2(c.t.interest),daily:r2(c.t.daily),extra:r2(c.t.extra),bankFee:r2(c.t.bank),discounts:c.disc,net:c.net};
  if(previous){cancelOperationReminders(previous);ops[ops.findIndex(o=>String(o.id)===String(previous.id))]=updated;}
@@ -147,7 +147,7 @@ function chequeBreakdownForSavedOperation(op,c){
  let bank=r2(amount*(Number(cfg.bankRate)||0)/100);return{days,monthly,iofDaily:daily,iofAdditional:additional,bank,total:r2(monthly+daily+additional+bank),net:r2(amount-monthly-daily-additional-bank)};
 }
 function renderHistory(){
- let q=$('q').value.trim().toLowerCase(),list=ops.filter(o=>!q||(o.client||'').toLowerCase().includes(q)||o.cheques.some(c=>(c.ref||'').toLowerCase().includes(q)));
+ let q=$('q').value.trim().toLowerCase(),list=ops.filter(o=>!q||(o.client||'').toLowerCase().includes(q));
  renderTotals();$('clearHistory').classList.toggle('hidden',!ops.length);
  $('historyList').innerHTML=!list.length?'<div class="empty">'+(ops.length?'Nada encontrado.':'Nenhuma operação salva ainda.')+'</div>':list.map(o=>`
  <div class="history-item">
@@ -164,7 +164,7 @@ function renderHistory(){
   <div class="hidden" id="d${o.id}">
    ${o.cheques.map((c,i)=>{let d=chequeBreakdownForSavedOperation(o,c);return `<div class="cheque-detail">
     <b>Cheque ${i+1}</b>
-    <div class="muted">Vencimento: ${c.due?br(c.due):'—'} • Valor original: ${money(c.amount)}${c.ref?' • '+esc(c.ref):''}</div>
+    <div class="muted">Vencimento: ${c.due?br(c.due):'—'} • Valor original: ${money(c.amount)}</div>
     <div class="discount-breakdown">
      <div class="summary-label">Descontos deste cheque (${d.days} dia(s))</div>
      <div class="sumrow"><span>Desconto mensal (${Number((o.settings||settings).rate||settings.rate).toLocaleString('pt-BR')}%)</span><b>${money(d.monthly)}</b></div>
@@ -179,11 +179,11 @@ function renderHistory(){
  </div>`).join('');
 }
 function showTab(n){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===n));['calc','history','settings'].forEach(id=>$(id).classList.toggle('hidden',id!==n));if(n==='history')renderHistory()}
-function dup(o){$('rows').innerHTML='';$('client').value=o.client||'';o.cheques.forEach(c=>addRow(c.due,c.amount,c.ref));showTab('calc');toast('Operação carregada. Ajuste as datas se precisar.')}
+function dup(o){$('rows').innerHTML='';$('client').value=o.client||'';o.cheques.forEach(c=>addRow(c.due,c.amount));showTab('calc');toast('Operação carregada. Ajuste as datas se precisar.')}
 function editSavedOperation(o){
  if(!o)return;
  editingOperationId=String(o.id);$('rows').innerHTML='';$('client').value=o.client||'';
- o.cheques.forEach(c=>addRow(c.due||'',c.amount||0,c.ref||''));
+ o.cheques.forEach(c=>addRow(c.due||'',c.amount||0));
  $('save').textContent='Salvar alterações';$('cancelEdit').classList.remove('hidden');
  showTab('calc');toast('Edite valores ou vencimentos. A operação será atualizada no mesmo registro.');
 }
@@ -197,7 +197,7 @@ async function shareOperation(o){
  if(!o)return;
  const lines=['CONTROLE DE CHEQUES',o.client?'Cliente: '+o.client:'', 'Data: '+(o.date?br(o.date):''),
   'Total dos cheques: '+money(o.face),'Descontos: '+money(o.discounts),'Valor líquido: '+money(o.net),'',
-  'CHEQUES:',...o.cheques.map((c,i)=>(i+1)+'. '+(c.due?br(c.due):'Sem data')+' — '+money(c.amount)+(c.ref?' — '+c.ref:''))];
+  'CHEQUES:',...o.cheques.map((c,i)=>(i+1)+'. '+(c.due?br(c.due):'Sem data')+' — '+money(c.amount))];
  const message=lines.filter(x=>x!==null&&x!==undefined).join('\n');
  try{
   if(navigator.share){await navigator.share({title:'Controle de Cheques',text:message});return;}

@@ -134,7 +134,10 @@ function saveOp(){
  if(!store('cc_history',ops)){if(previous)ops[ops.findIndex(o=>String(o.id)===String(previous.id))]=previous;else ops.shift();return toast('Não foi possível salvar. Verifique o espaço do aparelho.')}
  scheduleOperationReminders(updated);
  editingOperationId=null;$('save').textContent='Salvar operação';$('cancelEdit').classList.add('hidden');
- renderHistory();showTab('history');toast(previous?'Operação atualizada sem duplicar.':'Operação salva no histórico.');
+ renderHistory();
+ // Permanece na aba Nova operação e prepara um formulário limpo para o próximo cadastro.
+ $('rows').innerHTML='';$('client').value='';addRow();calculate();showTab('calc');
+ toast(previous?'Operação atualizada. Formulário pronto para a próxima operação.':'Operação salva. Formulário pronto para a próxima operação.');
 }
 function renderTotals(){let open=0,n=0,ret=0;ops.forEach(o=>o.cheques.forEach(c=>{let s=c.status||'aberto';if(s==='aberto'){open+=c.amount;n++}else if(s==='devolvido')ret+=c.amount}));
 $('totals').innerHTML=ops.length?`Em aberto: <b>${money(open)}</b> (${n} cheque(s))`+(ret?` • Devolvidos: <b class="warn">${money(ret)}</b>`:''):''}
@@ -195,12 +198,18 @@ function cancelEdit(){
 
 async function shareOperation(o){
  if(!o)return;
- const lines=['CONTROLE DE CHEQUES',o.client?'Cliente: '+o.client:'', 'Data: '+(o.date?br(o.date):''),
-  'Total dos cheques: '+money(o.face),'Descontos: '+money(o.discounts),'Valor líquido: '+money(o.net),'',
-  'CHEQUES:',...o.cheques.map((c,i)=>(i+1)+'. '+(c.due?br(c.due):'Sem data')+' — '+money(c.amount))];
- const message=lines.filter(x=>x!==null&&x!==undefined).join('\n');
+ // Compartilhamento enxuto: somente valor, vencimento e desconto de cada cheque.
+ const blocks=(o.cheques||[]).map(c=>{
+  const d=chequeBreakdownForSavedOperation(o,c);
+  return [
+   'Valor: '+money(c.amount),
+   'Data: '+(c.due?br(c.due):'Sem data'),
+   'Desconto: '+money(d.total)
+  ].join('\\n');
+ });
+ const message=blocks.join('\\n\\n');
  try{
-  if(navigator.share){await navigator.share({title:'Controle de Cheques',text:message});return;}
+  if(navigator.share){await navigator.share({text:message});return;}
  }catch(e){if(e&&e.name==='AbortError')return;}
  const url='https://wa.me/?text='+encodeURIComponent(message);
  if(window.Android&&typeof Android.shareText==='function'){Android.shareText(message);}

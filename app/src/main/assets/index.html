@@ -198,12 +198,12 @@ function cancelEdit(){
 
 async function shareOperation(o){
  if(!o)return;
- // Compartilhamento enxuto: somente valor, vencimento e desconto de cada cheque.
+ // Compartilhamento enxuto: somente data, valor e desconto, com quebras reais.
  const blocks=(o.cheques||[]).map(c=>{
   const d=chequeBreakdownForSavedOperation(o,c);
   return [
-   'Valor: '+money(c.amount),
    'Data: '+(c.due?br(c.due):'Sem data'),
+   'Valor: '+money(c.amount),
    'Desconto: '+money(d.total)
   ].join('\\n');
  });

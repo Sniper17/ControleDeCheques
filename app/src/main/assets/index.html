@@ -38,7 +38,7 @@ h1{font-size:23px;margin:5px 0 0}
 .hidden{display:none}
 .pill{color:#ddd;font-size:12px}
 .empty{text-align:center;padding:18px;color:#b8c0c3}
-.clear-history-wrap{display:flex;justify-content:flex-end;margin-top:14px}.btn.clear-history{width:auto;margin:0;padding:7px 10px;font-size:11px;border-radius:9px;opacity:.82}
+.clear-history-wrap{display:flex;justify-content:flex-end;margin-top:14px}.btn.clear-history{width:auto;margin:0;padding:7px 10px;font-size:11px;border-radius:9px;opacity:.82}.history-actions{display:flex;gap:7px;flex-wrap:wrap}.history-actions .btn{width:auto;flex:1 1 105px;margin-top:8px;padding:10px 8px;font-size:13px}.cheque-detail{padding:9px 0;border-top:1px solid #30383c}.cheque-detail .muted{margin:4px 0}.edit-note{color:var(--y);font-size:12px;margin-top:8px}
 .foot{text-align:center;color:#587363;font-size:12px;padding:18px}
 hr{border:0;border-top:1px solid #303a3e;margin:18px 0}
 .ov{position:fixed;inset:0;z-index:120;background:rgba(5,8,10,.55);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s}
@@ -61,10 +61,10 @@ hr{border:0;border-top:1px solid #303a3e;margin:18px 0}
 <div id="splash"><b style="font-size:24px">CONTROLE DE <span style="color:#ffdf32">CHEQUES</span></b><small style="color:#a5abb0;margin-top:7px">Controle financeiro, offline</small><div class="loader"></div></div>
 <header><small>Controle financeiro, offline</small><h1>Controle de Cheques</h1></header><div class="wrap"><div class="tabs"><button class="tab active" data-tab="calc">Nova operação</button><button class="tab" data-tab="history">Histórico</button><button class="tab" data-tab="settings">Taxas</button></div>
 <section id="calc"><div class="panel"><div class="section-title">Cheques da operação</div><div class="field"><label>Cliente (opcional)</label><input id="client" type="text" maxlength="60" placeholder="Nome do cliente"></div><div id="rows"></div><button class="btn secondary" id="add">＋ Adicionar cheque</button></div>
-<div class="summary"><div class="summary-label">Resumo da operação</div><div class="summary-group"><div class="summary-label">Valor líquido que você recebe</div><div class="big" id="net">R$ 0,00</div></div><div class="summary-group"><div class="summary-label">Valor bruto</div><div class="sumrow"><span>Total dos cheques</span><b id="face">R$ 0,00</b></div></div><div class="summary-group"><div class="summary-label">Custos do desconto</div><div class="sumrow"><span>Juros (taxa mensal)</span><b id="interest">R$ 0,00</b></div><div class="sumrow"><span>IOF diário</span><b id="daily">R$ 0,00</b></div><div class="sumrow"><span>IOF adicional</span><b id="extra">R$ 0,00</b></div><div class="sumrow"><span>Total de IOF</span><b id="totalIof">R$ 0,00</b></div><div class="sumrow"><span>Envelope / TAC</span><b id="envelope">R$ 0,00</b></div><div class="sumrow total"><span>Total de descontos</span><b id="discounts">R$ 0,00</b></div></div></div>
-<div class="card"><div class="section-title">Composição dos descontos</div><div id="bars"></div><div class="muted" id="daysTotal"></div><div class="muted" id="monthlyCost"></div></div><button class="btn" id="save">Salvar operação</button></section>
+<div class="summary"><div class="summary-label">Resumo da operação</div><div class="summary-group"><div class="summary-label">Valor líquido que você recebe</div><div class="big" id="net">R$ 0,00</div></div><div class="summary-group"><div class="summary-label">Valor bruto</div><div class="sumrow"><span>Total dos cheques</span><b id="face">R$ 0,00</b></div></div><div class="summary-group"><div class="summary-label">Custos do desconto</div><div class="sumrow"><span>Juros (taxa mensal)</span><b id="interest">R$ 0,00</b></div><div class="sumrow"><span>IOF diário</span><b id="daily">R$ 0,00</b></div><div class="sumrow"><span>IOF adicional</span><b id="extra">R$ 0,00</b></div><div class="sumrow"><span>Total de IOF</span><b id="totalIof">R$ 0,00</b></div><div class="sumrow"><span>Taxa do banco</span><b id="bankFee">R$ 0,00</b></div><div class="sumrow"><span>Envelope / TAC</span><b id="envelope">R$ 0,00</b></div><div class="sumrow total"><span>Total de descontos</span><b id="discounts">R$ 0,00</b></div></div></div>
+<div class="card"><div class="section-title">Composição dos descontos</div><div id="bars"></div><div class="muted" id="daysTotal"></div><div class="muted" id="monthlyCost"></div></div><button class="btn" id="save">Salvar operação</button><button class="btn secondary hidden" id="cancelEdit" type="button">Cancelar edição</button></section>
 <section id="history" class="hidden"><div class="panel"><div class="section-title">Operações salvas</div><div class="muted" id="totals"></div><div class="field" style="margin-top:10px"><input id="q" type="text" placeholder="Buscar por cliente ou emitente"></div><div id="historyList"></div><div class="clear-history-wrap"><button class="btn danger clear-history" id="clearHistory">Apagar todo o histórico</button></div></div></section>
-<section id="settings" class="hidden"><div class="panel"><div class="section-title">Configurações das taxas</div><div class="grid"><div class="field"><label>Taxa mensal (%)</label><input id="rate" type="text" inputmode="decimal"></div><div class="field"><label>Envelope / TAC (R$)</label><input id="tac" type="text" inputmode="decimal"></div><div class="field"><label>IOF diário (%)</label><input id="iofDaily" type="text" inputmode="decimal"></div><div class="field"><label>IOF adicional (%)</label><input id="iofExtra" type="text" inputmode="decimal"></div><div class="field"><label>Contagem de dias</label><select id="dayMode"><option value="calendar">Dias corridos</option><option value="business">Dias úteis</option></select></div><div class="field"><label>Vencimento em dia sem expediente</label><select id="adjust"><option value="1">Ir para o próximo dia útil</option><option value="0">Manter a data</option></select></div></div><button class="btn" id="saveSettings">Salvar taxas</button><p class="muted">Confira as alíquotas de IOF vigentes: elas mudam e diferem entre pessoa física e jurídica. Feriados considerados: nacionais, Carnaval, Sexta-feira Santa e Corpus Christi.</p>
+<section id="settings" class="hidden"><div class="panel"><div class="section-title">Configurações das taxas</div><div class="grid"><div class="field"><label>Taxa mensal (%)</label><input id="rate" type="text" inputmode="decimal"></div><div class="field"><label>Envelope / TAC (R$)</label><input id="tac" type="text" inputmode="decimal"></div><div class="field"><label>IOF diário (%)</label><input id="iofDaily" type="text" inputmode="decimal"></div><div class="field"><label>IOF adicional (%)</label><input id="iofExtra" type="text" inputmode="decimal"></div><div class="field"><label>Taxa do banco (%)</label><input id="bankRate" type="text" inputmode="decimal"></div><div class="field"><label>Contagem de dias</label><select id="dayMode"><option value="calendar">Dias corridos</option><option value="business">Dias úteis</option></select></div><div class="field"><label>Vencimento em dia sem expediente</label><select id="adjust"><option value="1">Ir para o próximo dia útil</option><option value="0">Manter a data</option></select></div></div><button class="btn" id="saveSettings">Salvar taxas</button><p class="muted">Confira as alíquotas de IOF vigentes: elas mudam e diferem entre pessoa física e jurídica. Feriados considerados: nacionais, Carnaval, Sexta-feira Santa e Corpus Christi.</p>
 <hr><div class="section-title">Backup</div><p class="muted">Gere o backup, copie o texto e guarde em um lugar seguro (notas, e-mail ou WhatsApp). Para restaurar, cole o texto abaixo.</p><div class="field"><textarea id="bk" rows="4" placeholder="O texto do backup aparece aqui"></textarea></div><div class="hbtns"><button class="btn secondary" id="mkBk">Gerar e copiar</button><button class="btn secondary" id="rsBk">Restaurar</button></div></div></section>
 <div class="foot">Dados armazenados somente neste aparelho. Faça backup em Taxas.</div></div>
 <script>
@@ -77,46 +77,100 @@ store=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e)
 load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},
 hash=s=>{let h=5381;for(const c of s)h=((h*33)^c.charCodeAt(0))>>>0;return String(h)},
 toast=m=>{let t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2800)};
-const defaults={rate:3.23,tac:50,iofDaily:.0082,iofExtra:.38,dayMode:'calendar',adjust:true};
+const defaults={rate:3.23,tac:50,iofDaily:.0082,iofExtra:.38,bankRate:3.33,dayMode:'calendar',adjust:true};
 let settings=Object.assign({},defaults,load('cc_settings',{})),ops=load('cc_history',[]);if(!load('cc_rate323_migrated',false)){settings.rate=3.23;store('cc_rate323_migrated',true)}delete settings.pin;store('cc_settings',settings);
 if(!Array.isArray(ops))ops=[];
+let editingOperationId=null;
 const hol={};
 function holidays(y){if(hol[y])return hol[y];let a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),E=Date.UTC(y,Math.floor((h+l-7*m+114)/31)-1,(h+l-7*m+114)%31+1),s=new Set(['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'].map(x=>y+'-'+x));[-48,-47,-2,60].forEach(n=>s.add(iso(new Date(E+n*864e5))));return hol[y]=s}
 const utc=s=>new Date(s+'T00:00:00Z'),isOff=d=>{let w=d.getUTCDay();return w===0||w===6||holidays(d.getUTCFullYear()).has(iso(d))};
 function nextBiz(s){let d=utc(s);while(isOff(d))d=new Date(+d+864e5);return iso(d)}
 function daysBetween(a,b){let s=utc(a),e=utc(b);if(e<=s)return 0;if(settings.dayMode==='calendar')return Math.round((e-s)/864e5);let n=0;for(let d=new Date(+s+864e5);d<=e;d=new Date(+d+864e5))if(!isOff(d))n++;return n}
 function parseDueDate(v){let m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec((v||'').trim());if(!m)return '';let day=+m[1],mo=+m[2],y=+m[3],d=new Date(Date.UTC(y,mo-1,day));return y>=2000&&d.getUTCFullYear()===y&&d.getUTCMonth()===mo-1&&d.getUTCDate()===day?`${y}-${m[2]}-${m[1]}`:''}
-function loadSettings(){$('rate').value=fmt(settings.rate);$('tac').value=fmt(settings.tac);$('iofDaily').value=fmt(settings.iofDaily);$('iofExtra').value=fmt(settings.iofExtra);$('dayMode').value=settings.dayMode;$('adjust').value=settings.adjust?'1':'0'}
-function saveSettings(){Object.assign(settings,{rate:dec($('rate').value),tac:dec($('tac').value),iofDaily:dec($('iofDaily').value),iofExtra:dec($('iofExtra').value),dayMode:$('dayMode').value,adjust:$('adjust').value==='1'});store('cc_settings',settings)?toast('Taxas salvas.'):toast('Não foi possível salvar. Verifique o espaço do aparelho.');calculate()}
+function loadSettings(){$('rate').value=fmt(settings.rate);$('tac').value=fmt(settings.tac);$('iofDaily').value=fmt(settings.iofDaily);$('iofExtra').value=fmt(settings.iofExtra);$('bankRate').value=fmt(settings.bankRate);$('dayMode').value=settings.dayMode;$('adjust').value=settings.adjust?'1':'0'}
+function saveSettings(){Object.assign(settings,{rate:dec($('rate').value),tac:dec($('tac').value),iofDaily:dec($('iofDaily').value),iofExtra:dec($('iofExtra').value),bankRate:dec($('bankRate').value),dayMode:$('dayMode').value,adjust:$('adjust').value==='1'});store('cc_settings',settings)?toast('Taxas salvas.'):toast('Não foi possível salvar. Verifique o espaço do aparelho.');calculate()}
 function addRow(date='',value='',ref=''){if($('rows').children.length>=30)return toast('Limite de 30 cheques.');let e=document.createElement('div');e.className='cheque';let dd=/^\d{4}-\d{2}-\d{2}$/.test(date)?br(date):date;e.innerHTML=`<div class="cheque-head"><span>Cheque</span><button class="remove">Remover</button></div><div class="grid"><div class="field"><label>Vencimento</label><input class="due" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off" value="${esc(dd)}"></div><div class="field"><label>Valor (R$)</label><input class="amount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" value="${esc(value?fmt(value):'')}"></div></div><div class="field" style="margin-top:10px"><label>Emitente ou nº do cheque (opcional)</label><input class="ref" type="text" maxlength="40" value="${esc(ref)}"></div><div class="muted calcLine">Informe os dados para calcular.</div>`;e.querySelector('.remove').onclick=()=>{e.remove();renumber();calculate()};let di=e.querySelector('.due');di.oninput=()=>{let g=di.value.replace(/\D/g,'').slice(0,8);di.value=g.replace(/^(\d{2})(\d)/,'$1/$2').replace(/^(\d{2})\/(\d{2})(\d)/,'$1/$2/$3');calculate()};e.querySelector('.amount').oninput=calculate;$('rows').appendChild(e);renumber();calculate()}
 function renumber(){[...$('rows').children].forEach((e,i)=>e.querySelector('.cheque-head span').textContent='Cheque '+(i+1))}
-function calculate(){let t={face:0,interest:0,daily:0,extra:0,days:0,wd:0},bad=0,S=settings,td=today();
+function calculate(){let t={face:0,interest:0,daily:0,extra:0,bank:0,days:0,wd:0},bad=0,S=settings,td=today();
 [...$('rows').children].forEach(e=>{let v=Math.max(0,num(e.querySelector('.amount').value)),raw=e.querySelector('.due').value,d=parseDueDate(raw),msg='',warn=false,days=0;
 if(v>0&&!d){bad++;warn=true;msg=raw?'Data inválida.':'Informe a data de vencimento.'}
 else if(d){let adj=S.adjust?nextBiz(d):d;days=daysBetween(td,adj);if(adj!==d)msg='Compensa em '+br(adj)+' (próximo dia útil).';if(days===0){warn=true;msg+=(msg?' ':'')+'Vencido ou vence hoje: sem desconto de prazo.'}}
 let i=r2(v*S.rate/100*days/30),b=Math.max(0,v-i),io=r2(b*S.iofDaily/100*Math.min(days,365)),x=r2(b*S.iofExtra/100);
-t.face+=v;t.interest+=i;t.daily+=io;t.extra+=x;t.days=Math.max(t.days,days);t.wd+=v*days;
+t.face+=v;t.interest+=i;t.daily+=io;t.extra+=x;t.bank+=r2(v*S.bankRate/100);t.days=Math.max(t.days,days);t.wd+=v*days;
 let L=e.querySelector('.calcLine');L.className='muted calcLine'+(warn?' warn':'');L.textContent=`${days} dia(s) • Juros ${money(i)} • IOF ${money(io+x)}`+(msg?'\n'+msg:'')});
-let disc=r2(t.interest+t.daily+t.extra+(t.face?S.tac:0)),net=r2(t.face-disc);
-for(let [id,v] of Object.entries({face:t.face,interest:t.interest,daily:t.daily,extra:t.extra,totalIof:t.daily+t.extra,envelope:t.face?S.tac:0,discounts:disc,net}))$(id).textContent=money(v);
-let parts=[['Juros',t.interest],['IOF diário',t.daily],['IOF adicional',t.extra],['Envelope / TAC',t.face?S.tac:0]],m=Math.max(1,...parts.map(p=>p[1]));
+let disc=r2(t.interest+t.daily+t.extra+t.bank+(t.face?S.tac:0)),net=r2(t.face-disc);
+for(let [id,v] of Object.entries({face:t.face,interest:t.interest,daily:t.daily,extra:t.extra,totalIof:t.daily+t.extra,bankFee:t.bank,envelope:t.face?S.tac:0,discounts:disc,net}))$(id).textContent=money(v);
+let parts=[['Juros',t.interest],['IOF diário',t.daily],['IOF adicional',t.extra],['Taxa do banco',t.bank],['Envelope / TAC',t.face?S.tac:0]],m=Math.max(1,...parts.map(p=>p[1]));
 $('bars').innerHTML=parts.map(p=>`<div style="margin:10px 0 4px">${p[0]}: ${money(p[1])}</div><div style="height:7px;background:#292e32;border-radius:8px"><div style="height:7px;width:${p[1]/m*100}%;background:#ffdf32;border-radius:8px"></div></div>`).join('');
 let cost=t.face?disc/t.face*100:0,avg=t.face?t.wd/t.face:0;
 $('daysTotal').textContent=t.face?`Maior prazo: ${t.days} dias • Custo efetivo: ${fmt(cost.toFixed(2))}%`:'';
 $('monthlyCost').textContent=avg?`Prazo médio: ${fmt(avg.toFixed(1))} dias • Custo equivalente mensal (aprox.): ${fmt((cost*30/avg).toFixed(2))}%`:'';
 return{t,disc,net,bad}}
-function saveOp(){let c=calculate();if(!c.t.face)return toast('Informe o valor de pelo menos um cheque.');if(c.bad)return toast('Corrija as datas dos cheques antes de salvar.');
-let cheques=[...$('rows').children].map(e=>({due:parseDueDate(e.querySelector('.due').value),amount:num(e.querySelector('.amount').value),ref:e.querySelector('.ref').value.trim(),status:'aberto'})).filter(x=>x.amount>0),{pin,...cfg}=settings;
-ops.unshift({id:Date.now(),date:today(),client:$('client').value.trim(),cheques,settings:cfg,face:c.t.face,interest:r2(c.t.interest),daily:r2(c.t.daily),extra:r2(c.t.extra),discounts:c.disc,net:c.net});
-if(!store('cc_history',ops)){ops.shift();return toast('Não foi possível salvar. Verifique o espaço do aparelho.')}
-renderHistory();toast('Operação salva no histórico.')}
+function scheduleOperationReminders(op){
+ if(!window.Android)return;
+ (op.cheques||[]).forEach((c,i)=>{
+  const rid=String(op.id)+'_'+i;
+  if(c.status==='aberto'&&c.due){try{Android.scheduleReminder(rid,c.due,(op.client?'Cliente: '+op.client+' - ':'')+'Cheque '+(i+1)+' • '+money(c.amount));}catch(e){}}
+  else{try{Android.cancelReminder(rid);}catch(e){}}
+ });
+}
+function cancelOperationReminders(op){
+ if(window.Android&&op)(op.cheques||[]).forEach((c,i)=>{try{Android.cancelReminder(String(op.id)+'_'+i)}catch(e){}});
+}
+function saveOp(){
+ let c=calculate();if(!c.t.face)return toast('Informe o valor de pelo menos um cheque.');if(c.bad)return toast('Corrija as datas dos cheques antes de salvar.');
+ let previous=editingOperationId?ops.find(o=>String(o.id)===String(editingOperationId)):null;
+ if(editingOperationId&&!previous){editingOperationId=null;return toast('A operação original não foi encontrada.')}
+ let cheques=[...$('rows').children].map((e,i)=>({due:parseDueDate(e.querySelector('.due').value),amount:num(e.querySelector('.amount').value),ref:e.querySelector('.ref').value.trim(),status:previous?.cheques?.[i]?.status||'aberto'})).filter(x=>x.amount>0);
+ let {pin,...cfg}=settings;
+ let updated={id:previous?previous.id:Date.now(),date:previous?.date||today(),client:$('client').value.trim(),cheques,settings:cfg,face:r2(c.t.face),interest:r2(c.t.interest),daily:r2(c.t.daily),extra:r2(c.t.extra),bankFee:r2(c.t.bank),discounts:c.disc,net:c.net};
+ if(previous){cancelOperationReminders(previous);ops[ops.findIndex(o=>String(o.id)===String(previous.id))]=updated;}
+ else ops.unshift(updated);
+ if(!store('cc_history',ops)){if(previous)ops[ops.findIndex(o=>String(o.id)===String(previous.id))]=previous;else ops.shift();return toast('Não foi possível salvar. Verifique o espaço do aparelho.')}
+ scheduleOperationReminders(updated);
+ editingOperationId=null;$('save').textContent='Salvar operação';$('cancelEdit').classList.add('hidden');
+ renderHistory();showTab('history');toast(previous?'Operação atualizada sem duplicar.':'Operação salva no histórico.');
+}
 function renderTotals(){let open=0,n=0,ret=0;ops.forEach(o=>o.cheques.forEach(c=>{let s=c.status||'aberto';if(s==='aberto'){open+=c.amount;n++}else if(s==='devolvido')ret+=c.amount}));
 $('totals').innerHTML=ops.length?`Em aberto: <b>${money(open)}</b> (${n} cheque(s))`+(ret?` • Devolvidos: <b class="warn">${money(ret)}</b>`:''):''}
-function renderHistory(){let q=$('q').value.trim().toLowerCase(),list=ops.filter(o=>!q||(o.client||'').toLowerCase().includes(q)||o.cheques.some(c=>(c.ref||'').toLowerCase().includes(q)));
-renderTotals();$('clearHistory').classList.toggle('hidden',!ops.length);
-$('historyList').innerHTML=!list.length?'<div class="empty">'+(ops.length?'Nada encontrado.':'Nenhuma operação salva ainda.')+'</div>':list.map(o=>`<div class="history-item"><b>${br(o.date)}</b>${o.client?' • '+esc(o.client):''} <span class="pill">${o.cheques.length} cheque(s)</span><div class="muted">Cheques: ${money(o.face)} • Descontos: ${money(o.discounts)}</div><b class="liq">Líquido: ${money(o.net)}</b><div class="hbtns"><button class="btn secondary" data-act="tg" data-id="${o.id}">Ver cheques</button><button class="btn secondary" data-act="dup" data-id="${o.id}">Duplicar</button><button class="btn danger" data-act="del" data-id="${o.id}">Apagar</button></div><div class="hidden" id="d${o.id}">${o.cheques.map((c,i)=>`<div class="ch"><span>${c.due?br(c.due):'—'} • ${money(c.amount)}${c.ref?' • '+esc(c.ref):''}</span><select data-id="${o.id}" data-i="${i}">${['aberto','compensado','devolvido'].map(s=>`<option value="${s}"${(c.status||'aberto')===s?' selected':''}>${s[0].toUpperCase()+s.slice(1)}</option>`).join('')}</select></div>`).join('')}</div></div>`).join('')}
+function renderHistory(){
+ let q=$('q').value.trim().toLowerCase(),list=ops.filter(o=>!q||(o.client||'').toLowerCase().includes(q)||o.cheques.some(c=>(c.ref||'').toLowerCase().includes(q)));
+ renderTotals();$('clearHistory').classList.toggle('hidden',!ops.length);
+ $('historyList').innerHTML=!list.length?'<div class="empty">'+(ops.length?'Nada encontrado.':'Nenhuma operação salva ainda.')+'</div>':list.map(o=>`
+ <div class="history-item">
+  <b>${br(o.date)}</b>${o.client?' • '+esc(o.client):''} <span class="pill">${o.cheques.length} cheque(s)</span>
+  <div class="muted">Cheques: ${money(o.face)} • Descontos: ${money(o.discounts)}</div>
+  <b class="liq">Líquido: ${money(o.net)}</b>
+  <div class="history-actions">
+   <button class="btn secondary" data-act="tg" data-id="${o.id}">Ver cheques</button>
+   <button class="btn secondary" data-act="edit" data-id="${o.id}">Editar</button>
+   <button class="btn secondary" data-act="share" data-id="${o.id}">Compartilhar</button>
+   <button class="btn secondary" data-act="dup" data-id="${o.id}">Duplicar</button>
+   <button class="btn danger" data-act="del" data-id="${o.id}">Apagar</button>
+  </div>
+  <div class="hidden" id="d${o.id}">
+   ${o.cheques.map((c,i)=>`<div class="cheque-detail">
+    <b>Cheque ${i+1}</b>
+    <div class="muted">Vencimento: ${c.due?br(c.due):'—'} • Valor: ${money(c.amount)}${c.ref?' • '+esc(c.ref):''}</div>
+    <div class="ch"><span>Situação</span><select data-id="${o.id}" data-i="${i}">${['aberto','compensado','devolvido'].map(s=>`<option value="${s}"${(c.status||'aberto')===s?' selected':''}>${s[0].toUpperCase()+s.slice(1)}</option>`).join('')}</select></div>
+   </div>`).join('')}
+  </div>
+ </div>`).join('');
+}
 function showTab(n){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===n));['calc','history','settings'].forEach(id=>$(id).classList.toggle('hidden',id!==n));if(n==='history')renderHistory()}
 function dup(o){$('rows').innerHTML='';$('client').value=o.client||'';o.cheques.forEach(c=>addRow(c.due,c.amount,c.ref));showTab('calc');toast('Operação carregada. Ajuste as datas se precisar.')}
+function editSavedOperation(o){
+ if(!o)return;
+ editingOperationId=String(o.id);$('rows').innerHTML='';$('client').value=o.client||'';
+ o.cheques.forEach(c=>addRow(c.due||'',c.amount||0,c.ref||''));
+ $('save').textContent='Salvar alterações';$('cancelEdit').classList.remove('hidden');
+ showTab('calc');toast('Edite valores ou vencimentos. A operação será atualizada no mesmo registro.');
+}
+function cancelEdit(){
+ editingOperationId=null;$('rows').innerHTML='';$('client').value='';
+ $('save').textContent='Salvar operação';$('cancelEdit').classList.add('hidden');addRow();calculate();toast('Edição cancelada.');
+}
+
 
 async function shareOperation(o){
  if(!o)return;
@@ -133,21 +187,35 @@ async function shareOperation(o){
 }
 
 function askConfirm(msg,label){return new Promise(res=>{let ov=$('confirmOverlay'),ok=$('confirmAccept'),no=$('confirmCancel');$('confirmMessage').textContent=msg;ok.textContent=label||'Confirmar';ov.classList.add('show');const end=v=>{ov.classList.remove('show');ok.onclick=no.onclick=null;res(v)};ok.onclick=()=>end(true);no.onclick=()=>end(false)})}
-$('historyList').onclick=async e=>{let b=e.target.closest('[data-act]');if(!b)return;let id=b.dataset.id,o=ops.find(x=>String(x.id)===id);if(!o)return;
-if(b.dataset.act==='tg')$('d'+id).classList.toggle('hidden');else if(b.dataset.act==='dup')dup(o);
-else if(await askConfirm('Apagar esta operação? Esta ação não pode ser desfeita.','Apagar')){ops=ops.filter(x=>x!==o);store('cc_history',ops);renderHistory();toast('Operação apagada.')}};
-$('historyList').onchange=e=>{let s=e.target.closest('select[data-i]');if(!s)return;let o=ops.find(x=>String(x.id)===s.dataset.id);if(!o)return;o.cheques[+s.dataset.i].status=s.value;store('cc_history',ops);renderTotals()};
-async function clearHistory(){if(!ops.length)return toast('Histórico vazio.');if(!await askConfirm('Apagar TODO o histórico? As taxas serão mantidas. Esta ação não pode ser desfeita.','Apagar tudo'))return;ops=[];store('cc_history',ops);renderHistory();toast('Histórico apagado.')}
-function mkBackup(){let {pin,...cfg}=settings,b=$('bk');b.value=JSON.stringify({v:1,settings:cfg,history:ops});b.focus();b.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}toast(ok?'Backup copiado. Cole em um lugar seguro.':'Selecione o texto e copie manualmente.')}
+$('historyList').onclick=async e=>{
+ let b=e.target.closest('[data-act]');if(!b)return;
+ let id=b.dataset.id,o=ops.find(x=>String(x.id)===id);if(!o)return;
+ if(b.dataset.act==='tg')$('d'+id).classList.toggle('hidden');
+ else if(b.dataset.act==='dup')dup(o);
+ else if(b.dataset.act==='edit')editSavedOperation(o);
+ else if(b.dataset.act==='share')shareOperation(o);
+ else if(b.dataset.act==='del'&&await askConfirm('Apagar esta operação? Esta ação não pode ser desfeita.','Apagar')){
+  cancelOperationReminders(o);ops=ops.filter(x=>x!==o);store('cc_history',ops);renderHistory();toast('Operação apagada.');
+ }
+};
+$('historyList').onchange=e=>{
+ let s=e.target.closest('select[data-i]');if(!s)return;
+ let o=ops.find(x=>String(x.id)===s.dataset.id);if(!o)return;
+ o.cheques[+s.dataset.i].status=s.value;store('cc_history',ops);
+ if(s.value==='aberto')scheduleOperationReminders(o);else if(window.Android){try{Android.cancelReminder(String(o.id)+'_'+s.dataset.i)}catch(e){}}
+ renderTotals();
+};
+async function clearHistory(){if(!ops.length)return toast('Histórico vazio.');if(!await askConfirm('Apagar TODO o histórico? As taxas serão mantidas. Esta ação não pode ser desfeita.','Apagar tudo'))return;ops.forEach(cancelOperationReminders);ops=[];store('cc_history',ops);renderHistory();toast('Histórico apagado.')}
+function mkBackup(){let {pin,...cfg}=settings,b=$('bk');b.value=JSON.stringify({v:1,settings:cfg,history:ops});b.focus();b.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(b.value).then(()=>toast('Backup copiado. Guarde o texto em lugar seguro.')).catch(()=>toast(ok?'Backup copiado.':'Selecione o texto e copie manualmente.'));else toast(ok?'Backup copiado.':'Selecione o texto e copie manualmente.')}
 async function restore(){let d;try{d=JSON.parse($('bk').value)}catch(e){return toast('Texto de backup inválido.')}
 if(!d||!Array.isArray(d.history))return toast('Texto de backup inválido.');
 if(!await askConfirm('Restaurar o backup? As operações do backup serão somadas ao histórico atual.','Restaurar'))return;
 let ids=new Set(ops.map(o=>String(o.id))),add=d.history.filter(o=>o&&o.id&&Array.isArray(o.cheques)&&!ids.has(String(o.id)));
-ops=ops.concat(add).sort((a,b)=>b.id-a.id);store('cc_history',ops);
+ops=ops.concat(add).sort((a,b)=>b.id-a.id);store('cc_history',ops);ops.forEach(scheduleOperationReminders);
 if(d.settings&&typeof d.settings==='object'){let p=settings.pin;settings=Object.assign({},defaults,d.settings);if(p)settings.pin=p;else delete settings.pin;store('cc_settings',settings);loadSettings();calculate()}
 renderHistory();toast(add.length+' operação(ões) restaurada(s).')}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-$('add').onclick=()=>addRow();$('save').onclick=saveOp;$('saveSettings').onclick=saveSettings;$('clearHistory').onclick=clearHistory;$('q').oninput=renderHistory;$('mkBk').onclick=mkBackup;$('rsBk').onclick=restore;
-loadSettings();addRow();renderHistory();
+$('add').onclick=()=>addRow();$('save').onclick=saveOp;$('cancelEdit').onclick=cancelEdit;$('saveSettings').onclick=saveSettings;$('clearHistory').onclick=clearHistory;$('q').oninput=renderHistory;$('mkBk').onclick=mkBackup;$('rsBk').onclick=restore;
+loadSettings();addRow();renderHistory();ops.forEach(scheduleOperationReminders);
 window.addEventListener('load',()=>setTimeout(()=>$('splash').classList.add('hide'),700));
 </script></body></html>

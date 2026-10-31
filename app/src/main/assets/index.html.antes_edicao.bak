@@ -1,0 +1,137 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090c0e"><title>Controle de Cheques</title><style>
+:root{--y:#ffdf32}
+*{box-sizing:border-box}
+html,body{min-height:100%;background:#f4f3ec;color:#111}
+body{margin:0;min-height:100dvh;font:16px system-ui,-apple-system,sans-serif;padding-bottom:20px;background-image:repeating-linear-gradient(0deg,transparent 0 37px,rgba(57,126,87,.14) 38px,transparent 39px),radial-gradient(ellipse at 8% 12%,rgba(77,151,105,.15),transparent 34%),radial-gradient(ellipse at 92% 70%,rgba(77,151,105,.13),transparent 32%);background-attachment:fixed}
+header{padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 16px;background:rgba(250,249,243,.91);border-bottom:1px solid rgba(57,126,87,.22)}
+header small{color:#587363;font-size:12px}
+h1{font-size:23px;margin:5px 0 0}
+.wrap{padding:12px 14px;max-width:760px;margin:auto}
+.tabs{display:flex;gap:8px;margin:8px 0 14px}
+.tab{flex:1;border:1px solid #30383c;border-radius:14px;padding:12px 6px;background:#090c0e;color:#f5f6f6;font:inherit;font-weight:750}
+.tab.active{background:var(--y);border-color:#d4b800;color:#090909}
+.panel,.card,.summary{background:linear-gradient(155deg,#111619,#07090a);border:1px solid #303a3e;color:#f5f6f6;border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 8px 22px #17251d26}
+.section-title{font-weight:850;font-size:17px;margin-bottom:12px;color:#fff}
+.muted{color:#b8c0c3;font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field label{display:block;color:#c3c9cb;font-size:13px;margin-bottom:6px}
+.field input,.field select,.field textarea,.box input{width:100%;min-width:0;border:1px solid #424d52;border-radius:13px;padding:13px 10px;background:#1b2225;color:#fff;font:inherit}
+.field textarea{font-size:12px;margin-top:6px}
+.cheque,.history-item,.summary-group{background:#0c1012;color:#f5f5f5;border:1px solid #354047;border-radius:16px;padding:13px;margin:11px 0}
+.cheque-head{display:flex;justify-content:space-between;font-weight:850;margin-bottom:10px;color:#fff}
+.remove{background:#451d21;color:#ff8585;border:1px solid #6b2c32;border-radius:9px;padding:8px 11px;font:inherit}
+.btn{border:1px solid #303a3e;border-radius:14px;padding:14px 16px;font:inherit;font-weight:850;width:100%;margin-top:10px;background:var(--y);color:#101214}
+.btn.secondary{background:#20282b;color:#fff;border-color:#465156}
+.btn.danger{background:#451d21;color:#ff8585;border-color:#6b2c32}
+.summary-label{color:#b8c0c3;font-size:12px;font-weight:850;margin-bottom:8px}
+.big{font-size:32px;font-weight:900;color:var(--y)}
+.sumrow{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #30383c}
+.sumrow b{white-space:nowrap}
+.sumrow.total b{color:var(--y)}
+#interest{color:#ff5555}
+.calcLine{white-space:pre-line;margin-top:8px}
+.warn{color:#ff8585}
+.hbtns{display:flex;gap:8px}.hbtns .btn{margin-top:8px;padding:11px 6px;font-size:14px}
+.liq{display:block;color:var(--y);margin:5px 0}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;margin-top:6px;border-top:1px solid #30383c;font-size:13px}
+.ch select{background:#1b2225;color:#fff;border:1px solid #424d52;border-radius:9px;padding:7px}
+.hidden{display:none}
+.pill{color:#ddd;font-size:12px}
+.empty{text-align:center;padding:18px;color:#b8c0c3}
+.foot{text-align:center;color:#587363;font-size:12px;padding:18px}
+hr{border:0;border-top:1px solid #303a3e;margin:18px 0}
+.ov{position:fixed;inset:0;z-index:120;background:rgba(5,8,10,.55);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s}
+.ov.show{opacity:1;visibility:visible}
+#lock{z-index:130}
+.box{min-width:240px;max-width:300px;background:#0c1012;border:1px solid #596267;border-radius:18px;padding:22px;text-align:center;color:#fff}
+.box input{margin-top:12px;text-align:center;font-size:22px;letter-spacing:.4em}
+.mt{font-weight:700;font-size:14px}
+.confirm-actions{display:flex;gap:9px;margin-top:14px}.confirm-actions .btn{margin:0}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);background:#090c0e;color:#fff;border:1px solid #596267;border-radius:12px;padding:11px 16px;font-size:14px;z-index:150;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;text-align:center}
+#toast.show{opacity:1}
+#splash{position:fixed;inset:0;z-index:140;background:#090c0e;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;transition:.45s}
+#splash.hide{opacity:0;visibility:hidden}
+.loader{width:140px;height:4px;background:#30383c;border-radius:9px;margin-top:40px;overflow:hidden}
+.loader:after{content:"";display:block;height:100%;width:40%;background:#ffdf32;animation:load 1.1s infinite}
+@keyframes load{from{transform:translateX(-110%)}to{transform:translateX(360%)}}
+@media(prefers-reduced-motion:reduce){.loader:after{animation:none}}
+</style></head><body><div id="toast"></div></div>
+<div id="confirmOverlay" class="ov"><div class="box"><div id="confirmMessage" class="mt"></div><div class="confirm-actions"><button id="confirmCancel" class="btn secondary">Cancelar</button><button id="confirmAccept" class="btn danger">Confirmar</button></div></div></div>
+<div id="splash"><b style="font-size:24px">CONTROLE DE <span style="color:#ffdf32">CHEQUES</span></b><small style="color:#a5abb0;margin-top:7px">Controle financeiro, offline</small><div class="loader"></div></div>
+<header><small>Controle financeiro, offline</small><h1>Controle de Cheques</h1></header><div class="wrap"><div class="tabs"><button class="tab active" data-tab="calc">Nova operação</button><button class="tab" data-tab="history">Histórico</button><button class="tab" data-tab="settings">Taxas</button></div>
+<section id="calc"><div class="panel"><div class="section-title">Cheques da operação</div><div class="field"><label>Cliente (opcional)</label><input id="client" type="text" maxlength="60" placeholder="Nome do cliente"></div><div id="rows"></div><button class="btn secondary" id="add">＋ Adicionar cheque</button></div>
+<div class="summary"><div class="summary-label">Resumo da operação</div><div class="summary-group"><div class="summary-label">Valor líquido que você recebe</div><div class="big" id="net">R$ 0,00</div></div><div class="summary-group"><div class="summary-label">Valor bruto</div><div class="sumrow"><span>Total dos cheques</span><b id="face">R$ 0,00</b></div></div><div class="summary-group"><div class="summary-label">Custos do desconto</div><div class="sumrow"><span>Juros (taxa mensal)</span><b id="interest">R$ 0,00</b></div><div class="sumrow"><span>IOF diário</span><b id="daily">R$ 0,00</b></div><div class="sumrow"><span>IOF adicional</span><b id="extra">R$ 0,00</b></div><div class="sumrow"><span>Total de IOF</span><b id="totalIof">R$ 0,00</b></div><div class="sumrow"><span>Envelope / TAC</span><b id="envelope">R$ 0,00</b></div><div class="sumrow total"><span>Total de descontos</span><b id="discounts">R$ 0,00</b></div></div></div>
+<div class="card"><div class="section-title">Composição dos descontos</div><div id="bars"></div><div class="muted" id="daysTotal"></div><div class="muted" id="monthlyCost"></div></div><button class="btn" id="save">Salvar operação</button></section>
+<section id="history" class="hidden"><div class="panel"><div class="section-title">Operações salvas</div><div class="muted" id="totals"></div><div class="field" style="margin-top:10px"><input id="q" type="text" placeholder="Buscar por cliente ou emitente"></div><div id="historyList"></div><button class="btn danger" id="clearHistory">Apagar todo o histórico</button></div></section>
+<section id="settings" class="hidden"><div class="panel"><div class="section-title">Configurações das taxas</div><div class="grid"><div class="field"><label>Taxa mensal (%)</label><input id="rate" type="text" inputmode="decimal"></div><div class="field"><label>Envelope / TAC (R$)</label><input id="tac" type="text" inputmode="decimal"></div><div class="field"><label>IOF diário (%)</label><input id="iofDaily" type="text" inputmode="decimal"></div><div class="field"><label>IOF adicional (%)</label><input id="iofExtra" type="text" inputmode="decimal"></div><div class="field"><label>Contagem de dias</label><select id="dayMode"><option value="calendar">Dias corridos</option><option value="business">Dias úteis</option></select></div><div class="field"><label>Vencimento em dia sem expediente</label><select id="adjust"><option value="1">Ir para o próximo dia útil</option><option value="0">Manter a data</option></select></div></div><button class="btn" id="saveSettings">Salvar taxas</button><p class="muted">Confira as alíquotas de IOF vigentes: elas mudam e diferem entre pessoa física e jurídica. Feriados considerados: nacionais, Carnaval, Sexta-feira Santa e Corpus Christi.</p>
+<hr><div class="section-title">Backup</div><p class="muted">Gere o backup, copie o texto e guarde em um lugar seguro (notas, e-mail ou WhatsApp). Para restaurar, cole o texto abaixo.</p><div class="field"><textarea id="bk" rows="4" placeholder="O texto do backup aparece aqui"></textarea></div><div class="hbtns"><button class="btn secondary" id="mkBk">Gerar e copiar</button><button class="btn secondary" id="rsBk">Restaurar</button></div></div></section>
+<div class="foot">Dados armazenados somente neste aparelho. Faça backup em Taxas.</div></div>
+<script>
+const $=id=>document.getElementById(id),money=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number.isFinite(n)?n:0),r2=n=>Math.round((n+Number.EPSILON)*100)/100,iso=d=>d.toISOString().slice(0,10),br=s=>s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4),
+esc=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';'),fmt=n=>String(n).replace('.',','),
+today=()=>{let d=new Date();return iso(new Date(d-d.getTimezoneOffset()*6e4))},
+dec=s=>{let n=parseFloat(String(s).trim().replace(',','.'));return Number.isFinite(n)?n:0},
+num=s=>{s=String(s??'').trim().replace(/[^\d.,]/g,'');if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');else if(/\.\d{3}(\.|$)/.test(s))s=s.replace(/\./g,'');let n=parseFloat(s);return Number.isFinite(n)?n:0},
+store=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},
+load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}},
+hash=s=>{let h=5381;for(const c of s)h=((h*33)^c.charCodeAt(0))>>>0;return String(h)},
+toast=m=>{let t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2800)};
+const defaults={rate:3.23,tac:50,iofDaily:.0082,iofExtra:.38,dayMode:'calendar',adjust:true};
+let settings=Object.assign({},defaults,load('cc_settings',{})),ops=load('cc_history',[]);if(!load('cc_rate323_migrated',false)){settings.rate=3.23;store('cc_rate323_migrated',true)}delete settings.pin;store('cc_settings',settings);
+if(!Array.isArray(ops))ops=[];
+const hol={};
+function holidays(y){if(hol[y])return hol[y];let a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),E=Date.UTC(y,Math.floor((h+l-7*m+114)/31)-1,(h+l-7*m+114)%31+1),s=new Set(['01-01','04-21','05-01','09-07','10-12','11-02','11-15','11-20','12-25'].map(x=>y+'-'+x));[-48,-47,-2,60].forEach(n=>s.add(iso(new Date(E+n*864e5))));return hol[y]=s}
+const utc=s=>new Date(s+'T00:00:00Z'),isOff=d=>{let w=d.getUTCDay();return w===0||w===6||holidays(d.getUTCFullYear()).has(iso(d))};
+function nextBiz(s){let d=utc(s);while(isOff(d))d=new Date(+d+864e5);return iso(d)}
+function daysBetween(a,b){let s=utc(a),e=utc(b);if(e<=s)return 0;if(settings.dayMode==='calendar')return Math.round((e-s)/864e5);let n=0;for(let d=new Date(+s+864e5);d<=e;d=new Date(+d+864e5))if(!isOff(d))n++;return n}
+function parseDueDate(v){let m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec((v||'').trim());if(!m)return '';let day=+m[1],mo=+m[2],y=+m[3],d=new Date(Date.UTC(y,mo-1,day));return y>=2000&&d.getUTCFullYear()===y&&d.getUTCMonth()===mo-1&&d.getUTCDate()===day?`${y}-${m[2]}-${m[1]}`:''}
+function loadSettings(){$('rate').value=fmt(settings.rate);$('tac').value=fmt(settings.tac);$('iofDaily').value=fmt(settings.iofDaily);$('iofExtra').value=fmt(settings.iofExtra);$('dayMode').value=settings.dayMode;$('adjust').value=settings.adjust?'1':'0'}
+function saveSettings(){Object.assign(settings,{rate:dec($('rate').value),tac:dec($('tac').value),iofDaily:dec($('iofDaily').value),iofExtra:dec($('iofExtra').value),dayMode:$('dayMode').value,adjust:$('adjust').value==='1'});store('cc_settings',settings)?toast('Taxas salvas.'):toast('Não foi possível salvar. Verifique o espaço do aparelho.');calculate()}
+function addRow(date='',value='',ref=''){if($('rows').children.length>=30)return toast('Limite de 30 cheques.');let e=document.createElement('div');e.className='cheque';let dd=/^\d{4}-\d{2}-\d{2}$/.test(date)?br(date):date;e.innerHTML=`<div class="cheque-head"><span>Cheque</span><button class="remove">Remover</button></div><div class="grid"><div class="field"><label>Vencimento</label><input class="due" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off" value="${esc(dd)}"></div><div class="field"><label>Valor (R$)</label><input class="amount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" value="${esc(value?fmt(value):'')}"></div></div><div class="field" style="margin-top:10px"><label>Emitente ou nº do cheque (opcional)</label><input class="ref" type="text" maxlength="40" value="${esc(ref)}"></div><div class="muted calcLine">Informe os dados para calcular.</div>`;e.querySelector('.remove').onclick=()=>{e.remove();renumber();calculate()};let di=e.querySelector('.due');di.oninput=()=>{let g=di.value.replace(/\D/g,'').slice(0,8);di.value=g.replace(/^(\d{2})(\d)/,'$1/$2').replace(/^(\d{2})\/(\d{2})(\d)/,'$1/$2/$3');calculate()};e.querySelector('.amount').oninput=calculate;$('rows').appendChild(e);renumber();calculate()}
+function renumber(){[...$('rows').children].forEach((e,i)=>e.querySelector('.cheque-head span').textContent='Cheque '+(i+1))}
+function calculate(){let t={face:0,interest:0,daily:0,extra:0,days:0,wd:0},bad=0,S=settings,td=today();
+[...$('rows').children].forEach(e=>{let v=Math.max(0,num(e.querySelector('.amount').value)),raw=e.querySelector('.due').value,d=parseDueDate(raw),msg='',warn=false,days=0;
+if(v>0&&!d){bad++;warn=true;msg=raw?'Data inválida.':'Informe a data de vencimento.'}
+else if(d){let adj=S.adjust?nextBiz(d):d;days=daysBetween(td,adj);if(adj!==d)msg='Compensa em '+br(adj)+' (próximo dia útil).';if(days===0){warn=true;msg+=(msg?' ':'')+'Vencido ou vence hoje: sem desconto de prazo.'}}
+let i=r2(v*S.rate/100*days/30),b=Math.max(0,v-i),io=r2(b*S.iofDaily/100*Math.min(days,365)),x=r2(b*S.iofExtra/100);
+t.face+=v;t.interest+=i;t.daily+=io;t.extra+=x;t.days=Math.max(t.days,days);t.wd+=v*days;
+let L=e.querySelector('.calcLine');L.className='muted calcLine'+(warn?' warn':'');L.textContent=`${days} dia(s) • Juros ${money(i)} • IOF ${money(io+x)}`+(msg?'\n'+msg:'')});
+let disc=r2(t.interest+t.daily+t.extra+(t.face?S.tac:0)),net=r2(t.face-disc);
+for(let [id,v] of Object.entries({face:t.face,interest:t.interest,daily:t.daily,extra:t.extra,totalIof:t.daily+t.extra,envelope:t.face?S.tac:0,discounts:disc,net}))$(id).textContent=money(v);
+let parts=[['Juros',t.interest],['IOF diário',t.daily],['IOF adicional',t.extra],['Envelope / TAC',t.face?S.tac:0]],m=Math.max(1,...parts.map(p=>p[1]));
+$('bars').innerHTML=parts.map(p=>`<div style="margin:10px 0 4px">${p[0]}: ${money(p[1])}</div><div style="height:7px;background:#292e32;border-radius:8px"><div style="height:7px;width:${p[1]/m*100}%;background:#ffdf32;border-radius:8px"></div></div>`).join('');
+let cost=t.face?disc/t.face*100:0,avg=t.face?t.wd/t.face:0;
+$('daysTotal').textContent=t.face?`Maior prazo: ${t.days} dias • Custo efetivo: ${fmt(cost.toFixed(2))}%`:'';
+$('monthlyCost').textContent=avg?`Prazo médio: ${fmt(avg.toFixed(1))} dias • Custo equivalente mensal (aprox.): ${fmt((cost*30/avg).toFixed(2))}%`:'';
+return{t,disc,net,bad}}
+function saveOp(){let c=calculate();if(!c.t.face)return toast('Informe o valor de pelo menos um cheque.');if(c.bad)return toast('Corrija as datas dos cheques antes de salvar.');
+let cheques=[...$('rows').children].map(e=>({due:parseDueDate(e.querySelector('.due').value),amount:num(e.querySelector('.amount').value),ref:e.querySelector('.ref').value.trim(),status:'aberto'})).filter(x=>x.amount>0),{pin,...cfg}=settings;
+ops.unshift({id:Date.now(),date:today(),client:$('client').value.trim(),cheques,settings:cfg,face:c.t.face,interest:r2(c.t.interest),daily:r2(c.t.daily),extra:r2(c.t.extra),discounts:c.disc,net:c.net});
+if(!store('cc_history',ops)){ops.shift();return toast('Não foi possível salvar. Verifique o espaço do aparelho.')}
+renderHistory();toast('Operação salva no histórico.')}
+function renderTotals(){let open=0,n=0,ret=0;ops.forEach(o=>o.cheques.forEach(c=>{let s=c.status||'aberto';if(s==='aberto'){open+=c.amount;n++}else if(s==='devolvido')ret+=c.amount}));
+$('totals').innerHTML=ops.length?`Em aberto: <b>${money(open)}</b> (${n} cheque(s))`+(ret?` • Devolvidos: <b class="warn">${money(ret)}</b>`:''):''}
+function renderHistory(){let q=$('q').value.trim().toLowerCase(),list=ops.filter(o=>!q||(o.client||'').toLowerCase().includes(q)||o.cheques.some(c=>(c.ref||'').toLowerCase().includes(q)));
+renderTotals();$('clearHistory').classList.toggle('hidden',!ops.length);
+$('historyList').innerHTML=!list.length?'<div class="empty">'+(ops.length?'Nada encontrado.':'Nenhuma operação salva ainda.')+'</div>':list.map(o=>`<div class="history-item"><b>${br(o.date)}</b>${o.client?' • '+esc(o.client):''} <span class="pill">${o.cheques.length} cheque(s)</span><div class="muted">Cheques: ${money(o.face)} • Descontos: ${money(o.discounts)}</div><b class="liq">Líquido: ${money(o.net)}</b><div class="hbtns"><button class="btn secondary" data-act="tg" data-id="${o.id}">Ver cheques</button><button class="btn secondary" data-act="dup" data-id="${o.id}">Duplicar</button><button class="btn danger" data-act="del" data-id="${o.id}">Apagar</button></div><div class="hidden" id="d${o.id}">${o.cheques.map((c,i)=>`<div class="ch"><span>${c.due?br(c.due):'—'} • ${money(c.amount)}${c.ref?' • '+esc(c.ref):''}</span><select data-id="${o.id}" data-i="${i}">${['aberto','compensado','devolvido'].map(s=>`<option value="${s}"${(c.status||'aberto')===s?' selected':''}>${s[0].toUpperCase()+s.slice(1)}</option>`).join('')}</select></div>`).join('')}</div></div>`).join('')}
+function showTab(n){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===n));['calc','history','settings'].forEach(id=>$(id).classList.toggle('hidden',id!==n));if(n==='history')renderHistory()}
+function dup(o){$('rows').innerHTML='';$('client').value=o.client||'';o.cheques.forEach(c=>addRow(c.due,c.amount,c.ref));showTab('calc');toast('Operação carregada. Ajuste as datas se precisar.')}
+function askConfirm(msg,label){return new Promise(res=>{let ov=$('confirmOverlay'),ok=$('confirmAccept'),no=$('confirmCancel');$('confirmMessage').textContent=msg;ok.textContent=label||'Confirmar';ov.classList.add('show');const end=v=>{ov.classList.remove('show');ok.onclick=no.onclick=null;res(v)};ok.onclick=()=>end(true);no.onclick=()=>end(false)})}
+$('historyList').onclick=async e=>{let b=e.target.closest('[data-act]');if(!b)return;let id=b.dataset.id,o=ops.find(x=>String(x.id)===id);if(!o)return;
+if(b.dataset.act==='tg')$('d'+id).classList.toggle('hidden');else if(b.dataset.act==='dup')dup(o);
+else if(await askConfirm('Apagar esta operação? Esta ação não pode ser desfeita.','Apagar')){ops=ops.filter(x=>x!==o);store('cc_history',ops);renderHistory();toast('Operação apagada.')}};
+$('historyList').onchange=e=>{let s=e.target.closest('select[data-i]');if(!s)return;let o=ops.find(x=>String(x.id)===s.dataset.id);if(!o)return;o.cheques[+s.dataset.i].status=s.value;store('cc_history',ops);renderTotals()};
+async function clearHistory(){if(!ops.length)return toast('Histórico vazio.');if(!await askConfirm('Apagar TODO o histórico? As taxas serão mantidas. Esta ação não pode ser desfeita.','Apagar tudo'))return;ops=[];store('cc_history',ops);renderHistory();toast('Histórico apagado.')}
+function mkBackup(){let {pin,...cfg}=settings,b=$('bk');b.value=JSON.stringify({v:1,settings:cfg,history:ops});b.focus();b.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}toast(ok?'Backup copiado. Cole em um lugar seguro.':'Selecione o texto e copie manualmente.')}
+async function restore(){let d;try{d=JSON.parse($('bk').value)}catch(e){return toast('Texto de backup inválido.')}
+if(!d||!Array.isArray(d.history))return toast('Texto de backup inválido.');
+if(!await askConfirm('Restaurar o backup? As operações do backup serão somadas ao histórico atual.','Restaurar'))return;
+let ids=new Set(ops.map(o=>String(o.id))),add=d.history.filter(o=>o&&o.id&&Array.isArray(o.cheques)&&!ids.has(String(o.id)));
+ops=ops.concat(add).sort((a,b)=>b.id-a.id);store('cc_history',ops);
+if(d.settings&&typeof d.settings==='object'){let p=settings.pin;settings=Object.assign({},defaults,d.settings);if(p)settings.pin=p;else delete settings.pin;store('cc_settings',settings);loadSettings();calculate()}
+renderHistory();toast(add.length+' operação(ões) restaurada(s).')}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+$('add').onclick=()=>addRow();$('save').onclick=saveOp;$('saveSettings').onclick=saveSettings;$('clearHistory').onclick=clearHistory;$('q').oninput=renderHistory;$('mkBk').onclick=mkBackup;$('rsBk').onclick=restore;
+loadSettings();addRow();renderHistory();
+window.addEventListener('load',()=>setTimeout(()=>$('splash').classList.add('hide'),700));
+</script></body></html>

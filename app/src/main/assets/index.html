@@ -32,6 +32,7 @@ h1{font-size:23px;margin:5px 0 0}
 .calcLine{white-space:pre-line;margin-top:8px}
 .warn{color:#ff8585}
 .hbtns{display:flex;gap:8px}.hbtns .btn{margin-top:8px;padding:11px 6px;font-size:14px}
+.discount-total{display:block;color:#ff6268;font-weight:850;margin:5px 0}
 .liq{display:block;color:var(--y);margin:5px 0}
 .ch{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;margin-top:6px;border-top:1px solid #30383c;font-size:13px}
 .ch select{background:#071a35;color:#fff;border:1px solid #1b5a91;border-radius:9px;padding:7px}
@@ -193,6 +194,7 @@ function renderHistory(){
  <div class="history-item">
   <b>${br(o.date)}</b>${o.client?' • '+esc(o.client):''} <span class="pill">${o.cheques.length} cheque(s)</span>
   <div class="muted">Cheques: ${money(savedOperationTotals(o).face)} • Descontos: ${money(savedOperationTotals(o).discounts)}</div>
+  <b class="discount-total">Descontos: ${money(savedOperationTotals(o).discounts)}</b>
   <b class="liq">Líquido: ${money(savedOperationTotals(o).net)}</b>
   <div class="history-actions">
    <button class="btn secondary" data-act="tg" data-id="${o.id}">Ver cheques</button>

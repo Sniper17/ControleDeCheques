@@ -39,7 +39,7 @@ h1{font-size:23px;margin:5px 0 0}
 .hidden{display:none}
 .pill{color:#ddd;font-size:12px}
 .empty{text-align:center;padding:18px;color:#b8c0c3}
-.clear-history-wrap{display:flex;justify-content:flex-end;margin-top:18px}.btn.clear-history{width:auto;max-width:190px;padding:8px 12px;font-size:12px;margin-top:4px;border-radius:9px;opacity:.9}.history-actions{display:flex;gap:7px;flex-wrap:wrap}.history-actions .btn{width:auto;flex:1 1 105px;margin-top:8px;padding:10px 8px;font-size:13px}.cheque-detail{padding:9px 0;border-top:1px solid #30383c}.cheque-detail .muted{margin:4px 0}.discount-breakdown{background:#151c1f;border:1px solid #303a3e;border-radius:12px;padding:10px;margin-top:9px}.discount-breakdown .sumrow{padding:7px 0;font-size:13px}.discount-breakdown .sumrow.total b{color:var(--y)}.discount-breakdown .net-cheque{font-size:15px;font-weight:850;color:var(--y);padding-top:9px}.edit-note{color:var(--y);font-size:12px;margin-top:8px}
+.clear-history-wrap{display:flex;justify-content:flex-end;margin-top:18px}.btn.clear-history{width:auto;max-width:190px;padding:8px 12px;font-size:12px;margin-top:4px;border-radius:9px;opacity:.9}.history-actions{display:flex;gap:7px;flex-wrap:wrap}.history-actions .btn{width:auto;flex:1 1 105px;margin-top:8px;padding:10px 8px;font-size:13px}.cheque-detail{padding:9px 0;border-top:1px solid #30383c}.cheque-detail .muted{margin:4px 0}.discount-breakdown{background:#151c1f;border:1px solid #303a3e;border-radius:12px;padding:10px;margin-top:9px}.discount-breakdown .sumrow{padding:7px 0;font-size:13px}.discount-breakdown .sumrow.total b{color:#ff6268}.discount-breakdown .net-cheque{font-size:15px;font-weight:850;color:var(--y);padding-top:9px}.edit-note{color:var(--y);font-size:12px;margin-top:8px}
 .foot{text-align:center;color:#70dfff;font-size:12px;padding:18px}
 hr{border:0;border-top:1px solid #303a3e;margin:18px 0}
 .ov{position:fixed;inset:0;z-index:120;background:rgba(5,8,10,.55);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s}
@@ -122,6 +122,17 @@ function loadSettings(){$('rate').value=settings.rate==null?'':fmt(settings.rate
 function saveSettings(){let rateText=$('rate').value.trim();if(rateText&&(!(dec(rateText)>0)||!Number.isFinite(dec(rateText))))return toast('Informe uma taxa mensal válida, maior que zero.');Object.assign(settings,{rate:rateText?dec(rateText):null,tac:dec($('tac').value),iofDaily:dec($('iofDaily').value),iofExtra:dec($('iofExtra').value),dayMode:$('dayMode').value,adjust:$('adjust').value==='1'});store('cc_settings',settings)?toast('Taxas salvas.'):toast('Não foi possível salvar. Verifique o espaço do aparelho.');calculate()}
 function addRow(date='',value=''){if($('rows').children.length>=30)return toast('Limite de 30 cheques.');let e=document.createElement('div');e.className='cheque';let dd=/^\d{4}-\d{2}-\d{2}$/.test(date)?br(date):date;e.innerHTML=`<div class="cheque-head"><span>Cheque</span><button class="remove">Remover</button></div><div class="grid"><div class="field"><label>Vencimento</label><input class="due" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" autocomplete="off" value="${esc(dd)}"></div><div class="field"><label>Valor (R$)</label><input class="amount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off" value="${esc(value?fmt(value):'')}"></div></div><div class="muted calcLine">Informe os dados para calcular.</div>`;e.querySelector('.remove').onclick=()=>{e.remove();renumber();calculate()};let di=e.querySelector('.due');di.oninput=()=>{let g=di.value.replace(/\D/g,'').slice(0,8);di.value=g.replace(/^(\d{2})(\d)/,'$1/$2').replace(/^(\d{2})\/(\d{2})(\d)/,'$1/$2/$3');calculate()};e.querySelector('.amount').oninput=calculate;$('rows').appendChild(e);renumber();calculate()}
 function renumber(){[...$('rows').children].forEach((e,i)=>e.querySelector('.cheque-head span').textContent='Cheque '+(i+1))}
+// No Android, Enter/Enviar nos campos do cheque apenas fecha o teclado.
+document.addEventListener('keydown',e=>{
+ const field=e.target;
+ if(e.key==='Enter'&&(field.classList.contains('due')||field.classList.contains('amount'))){
+  e.preventDefault();
+  e.stopPropagation();
+  field.blur();
+  calculate();
+ }
+},true);
+
 function calculate(){
  let t={face:0,interest:0,daily:0,extra:0,days:0,wd:0},bad=0,S=settings,td=today(),chequeBreakdowns=[];
  if(!(Number(S.rate)>0)){['face','interest','daily','extra','totalIof','envelope','discounts','net'].forEach(id=>$(id).textContent='—');$('daysTotal')&&($('daysTotal').textContent='Informe a taxa mensal do seu banco nas configurações para calcular.');$('monthlyCost')&&($('monthlyCost').textContent='');[...$('rows').children].forEach(e=>{let L=e.querySelector('.calcLine');L.className='muted calcLine warn';L.textContent='Informe a taxa mensal do seu banco nas configurações.'});return{t,disc:0,net:0,bad,rateMissing:true,cheques:chequeBreakdowns}}

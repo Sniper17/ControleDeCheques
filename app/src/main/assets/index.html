@@ -1,27 +1,27 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#090c0e"><title>Controle de Cheques</title><style>
-:root{--y:#ffdf32}
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#06152f"><title>Cálculo de Cheques</title><style>
+:root{--y:#00c8ff;--bg:#06152f;--panel:#0b1d3a;--line:#174b82}
 *{box-sizing:border-box}
-html,body{min-height:100%;background:#f4f3ec;color:#111}
-body{margin:0;min-height:100dvh;font:16px system-ui,-apple-system,sans-serif;padding-bottom:20px;background-image:repeating-linear-gradient(0deg,transparent 0 37px,rgba(57,126,87,.14) 38px,transparent 39px),radial-gradient(ellipse at 8% 12%,rgba(77,151,105,.15),transparent 34%),radial-gradient(ellipse at 92% 70%,rgba(77,151,105,.13),transparent 32%);background-attachment:fixed}
-header{padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 16px;background:rgba(250,249,243,.91);border-bottom:1px solid rgba(57,126,87,.22)}
-header small{color:#587363;font-size:12px}
+html,body{min-height:100%;background:#06152f;color:#f5f9ff}
+body{margin:0;min-height:100dvh;font:16px system-ui,-apple-system,sans-serif;padding-bottom:20px;background-image:radial-gradient(ellipse at 10% 0%,rgba(0,160,255,.20),transparent 38%),radial-gradient(ellipse at 95% 85%,rgba(0,90,220,.16),transparent 38%);background-attachment:fixed}
+header{padding:calc(env(safe-area-inset-top,0px) + 22px) 20px 16px;background:rgba(5,19,43,.96);border-bottom:1px solid #1264a5}
+header small{color:#70dfff;font-size:12px}
 h1{font-size:23px;margin:5px 0 0}
 .wrap{padding:12px 14px;max-width:760px;margin:auto}
 .tabs{display:flex;gap:8px;margin:8px 0 14px}
-.tab{flex:1;border:1px solid #30383c;border-radius:14px;padding:12px 6px;background:#090c0e;color:#f5f6f6;font:inherit;font-weight:750}
+.tab{flex:1;border:1px solid #174b82;border-radius:14px;padding:12px 6px;background:#0b1d3a;color:#f5f6f6;font:inherit;font-weight:750}
 .tab.active{background:var(--y);border-color:#d4b800;color:#090909}
-.panel,.card,.summary{background:linear-gradient(155deg,#111619,#07090a);border:1px solid #303a3e;color:#f5f6f6;border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 8px 22px #17251d26}
+.panel,.card,.summary{background:linear-gradient(155deg,#0d2345,#061329);border:1px solid #174b82;color:#f5f6f6;border-radius:20px;padding:17px;margin:12px 0;box-shadow:0 8px 22px #17251d26}
 .section-title{font-weight:850;font-size:17px;margin-bottom:12px;color:#fff}
 .muted{color:#b8c0c3;font-size:13px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .field label{display:block;color:#c3c9cb;font-size:13px;margin-bottom:6px}
-.field input,.field select,.field textarea,.box input{width:100%;min-width:0;border:1px solid #424d52;border-radius:13px;padding:13px 10px;background:#1b2225;color:#fff;font:inherit}
+.field input,.field select,.field textarea,.box input{width:100%;min-width:0;border:1px solid #1b5a91;border-radius:13px;padding:13px 10px;background:#071a35;color:#fff;font:inherit}
 .field textarea{font-size:12px;margin-top:6px}
-.cheque,.history-item,.summary-group{background:#0c1012;color:#f5f5f5;border:1px solid #354047;border-radius:16px;padding:13px;margin:11px 0}
+.cheque,.history-item,.summary-group{background:#081a35;color:#f5f5f5;border:1px solid #174b82;border-radius:16px;padding:13px;margin:11px 0}
 .cheque-head{display:flex;justify-content:space-between;font-weight:850;margin-bottom:10px;color:#fff}
-.remove{background:#451d21;color:#ff8585;border:1px solid #6b2c32;border-radius:9px;padding:8px 11px;font:inherit}
+.remove{background:#451d21;color:#ff8585;border:1px solid #8b3440;border-radius:9px;padding:8px 11px;font:inherit}
 .btn{border:1px solid #303a3e;border-radius:14px;padding:14px 16px;font:inherit;font-weight:850;width:100%;margin-top:10px;background:var(--y);color:#101214}
-.btn.secondary{background:#20282b;color:#fff;border-color:#465156}
+.btn.secondary{background:#102b50;color:#fff;border-color:#1b5a91}
 .btn.danger{background:#451d21;color:#ff8585;border-color:#6b2c32}
 .summary-label{color:#b8c0c3;font-size:12px;font-weight:850;margin-bottom:8px}
 .big{font-size:32px;font-weight:900;color:var(--y)}
@@ -34,12 +34,12 @@ h1{font-size:23px;margin:5px 0 0}
 .hbtns{display:flex;gap:8px}.hbtns .btn{margin-top:8px;padding:11px 6px;font-size:14px}
 .liq{display:block;color:var(--y);margin:5px 0}
 .ch{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;margin-top:6px;border-top:1px solid #30383c;font-size:13px}
-.ch select{background:#1b2225;color:#fff;border:1px solid #424d52;border-radius:9px;padding:7px}
+.ch select{background:#071a35;color:#fff;border:1px solid #1b5a91;border-radius:9px;padding:7px}
 .hidden{display:none}
 .pill{color:#ddd;font-size:12px}
 .empty{text-align:center;padding:18px;color:#b8c0c3}
-.clear-history-wrap{display:flex;justify-content:flex-end;margin-top:14px}.btn.clear-history{width:auto;margin:0;padding:7px 10px;font-size:11px;border-radius:9px;opacity:.82}.history-actions{display:flex;gap:7px;flex-wrap:wrap}.history-actions .btn{width:auto;flex:1 1 105px;margin-top:8px;padding:10px 8px;font-size:13px}.cheque-detail{padding:9px 0;border-top:1px solid #30383c}.cheque-detail .muted{margin:4px 0}.discount-breakdown{background:#151c1f;border:1px solid #303a3e;border-radius:12px;padding:10px;margin-top:9px}.discount-breakdown .sumrow{padding:7px 0;font-size:13px}.discount-breakdown .sumrow.total b{color:var(--y)}.discount-breakdown .net-cheque{font-size:15px;font-weight:850;color:var(--y);padding-top:9px}.edit-note{color:var(--y);font-size:12px;margin-top:8px}
-.foot{text-align:center;color:#587363;font-size:12px;padding:18px}
+.clear-history-wrap{display:flex;justify-content:flex-end;margin-top:18px}.btn.clear-history{width:auto;max-width:190px;padding:8px 12px;font-size:12px;margin-top:4px;border-radius:9px;opacity:.9}.history-actions{display:flex;gap:7px;flex-wrap:wrap}.history-actions .btn{width:auto;flex:1 1 105px;margin-top:8px;padding:10px 8px;font-size:13px}.cheque-detail{padding:9px 0;border-top:1px solid #30383c}.cheque-detail .muted{margin:4px 0}.discount-breakdown{background:#151c1f;border:1px solid #303a3e;border-radius:12px;padding:10px;margin-top:9px}.discount-breakdown .sumrow{padding:7px 0;font-size:13px}.discount-breakdown .sumrow.total b{color:var(--y)}.discount-breakdown .net-cheque{font-size:15px;font-weight:850;color:var(--y);padding-top:9px}.edit-note{color:var(--y);font-size:12px;margin-top:8px}
+.foot{text-align:center;color:#70dfff;font-size:12px;padding:18px}
 hr{border:0;border-top:1px solid #303a3e;margin:18px 0}
 .ov{position:fixed;inset:0;z-index:120;background:rgba(5,8,10,.55);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .18s,visibility .18s}
 .ov.show{opacity:1;visibility:visible}
@@ -58,8 +58,8 @@ hr{border:0;border-top:1px solid #303a3e;margin:18px 0}
 @media(prefers-reduced-motion:reduce){.loader:after{animation:none}}
 </style></head><body><div id="toast"></div></div>
 <div id="confirmOverlay" class="ov"><div class="box"><div id="confirmMessage" class="mt"></div><div class="confirm-actions"><button id="confirmCancel" class="btn secondary">Cancelar</button><button id="confirmAccept" class="btn danger">Confirmar</button></div></div></div>
-<div id="splash"><b style="font-size:24px">CONTROLE DE <span style="color:#ffdf32">CHEQUES</span></b><small style="color:#a5abb0;margin-top:7px">Controle financeiro, offline</small><div class="loader"></div></div>
-<header><small>Controle financeiro, offline</small><h1>Controle de Cheques</h1></header><div class="wrap"><div class="tabs"><button class="tab active" data-tab="calc">Nova operação</button><button class="tab" data-tab="history">Salvos</button><button class="tab" data-tab="settings">Taxas</button></div>
+<div id="splash"><b style="font-size:24px">CÁLCULO DE <span style="color:#00c8ff">CHEQUES</span></b><small style="color:#a5abb0;margin-top:7px">Controle financeiro, offline</small><div class="loader"></div></div>
+<header><small>CÁLCULO FINANCEIRO • OFFLINE</small><h1>Cálculo de Cheques</h1></header><div class="wrap"><div class="tabs"><button class="tab active" data-tab="calc">Nova operação</button><button class="tab" data-tab="history">Salvos</button><button class="tab" data-tab="settings">Taxas</button></div>
 <section id="calc"><div class="panel"><div class="section-title">Cheques da operação</div><div class="field"><label>Cliente (opcional)</label><input id="client" type="text" maxlength="60" placeholder="Nome do cliente"></div><div id="rows"></div><button class="btn secondary" id="add">＋ Adicionar cheque</button><button class="btn" id="save">Salvar operação</button><button class="btn secondary hidden" id="cancelEdit" type="button">Cancelar edição</button></div>
 <div class="summary"><div class="summary-label">Resumo da operação</div><div class="summary-group"><div class="summary-label">Valor líquido que você recebe</div><div class="big" id="net">R$ 0,00</div></div><div class="summary-group"><div class="summary-label">Valor bruto</div><div class="sumrow"><span>Total dos cheques</span><b id="face">R$ 0,00</b></div></div><div class="summary-group"><div class="summary-label">Custos do desconto</div><div class="sumrow"><span>Juros (taxa mensal)</span><b id="interest">R$ 0,00</b></div><div class="sumrow"><span>IOF diário</span><b id="daily">R$ 0,00</b></div><div class="sumrow"><span>IOF adicional</span><b id="extra">R$ 0,00</b></div><div class="sumrow"><span>Total de IOF</span><b id="totalIof">R$ 0,00</b></div><div class="sumrow"><span>Taxa do banco</span><b id="bankFee">R$ 0,00</b></div><div class="sumrow"><span>Envelope / TAC</span><b id="envelope">R$ 0,00</b></div><div class="sumrow total"><span>Total de descontos</span><b id="discounts">R$ 0,00</b></div></div></div>
 <div class="card"><div class="section-title">Composição dos descontos</div><div id="bars"></div><div class="muted" id="daysTotal"></div><div class="muted" id="monthlyCost"></div></div></section>
@@ -214,8 +214,7 @@ async function shareOperation(o){
  (o.cheques||[]).forEach((c,i)=>{
   const due=c.due?br(c.due):'Sem data';
   const amount=money(c.amount);
-  const issuer=(c.ref||c.issuer||c.issuerName||'').toString().trim();
-  lines.push((i+1)+'. '+due+' — '+amount+(issuer?' — '+issuer:''));
+  lines.push((i+1)+'. '+due+' — '+amount);
  });
  const message=lines.join('\n');
  try{

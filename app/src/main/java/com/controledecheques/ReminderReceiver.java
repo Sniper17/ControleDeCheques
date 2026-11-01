@@ -27,7 +27,7 @@ public class ReminderReceiver extends BroadcastReceiver {
         Notification.Builder builder = Build.VERSION.SDK_INT >= 26
             ? new Notification.Builder(context, CHANNEL_ID) : new Notification.Builder(context);
         builder.setSmallIcon(context.getApplicationInfo().icon)
-            .setContentTitle("Controle de Cheques")
+            .setContentTitle("Cálculo de Cheques")
             .setContentText(title)
             .setStyle(new Notification.BigTextStyle().bigText(title + " — confira o recebimento."))
             .setAutoCancel(true).setContentIntent(content).setPriority(Notification.PRIORITY_HIGH);

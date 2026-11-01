@@ -161,9 +161,9 @@ public class MainActivity extends Activity {
             runOnUiThread(() -> {
                 Intent send = new Intent(Intent.ACTION_SEND);
                 send.setType("text/plain");
-                send.putExtra(Intent.EXTRA_SUBJECT, "Controle de Cheques");
+                send.putExtra(Intent.EXTRA_SUBJECT, "Cálculo de Cheques");
                 send.putExtra(Intent.EXTRA_TEXT, text == null ? "" : text);
-                startActivity(Intent.createChooser(send, "Compartilhar operação"));
+                startActivity(Intent.createChooser(send, "Compartilhar cálculo"));
             });
         }
 

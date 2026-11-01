@@ -202,7 +202,7 @@ function renderHistory(){
    <button class="btn danger" data-act="del" data-id="${o.id}">Apagar</button>
   </div>
   <div class="hidden" id="d${o.id}">
-   ${o.cheques.map((c,i)=>{let d=chequeBreakdownForSavedOperation(o,c);return `<div class="cheque-detail">
+   ${o.cheques.map((c,i)=>{let d=chequeBreakdownForSavedOperation(o,c),tacForCheque=i===0?savedOperationTotals(o).tac:0,totalWithTac=r2(d.total+tacForCheque),netWithTac=r2(d.net-tacForCheque);return `<div class="cheque-detail">
     <b>Cheque ${i+1}</b>
     <div class="muted">Vencimento: ${c.due?br(c.due):'—'} • Valor original: ${money(c.amount)}</div>
     <div class="discount-breakdown">
@@ -210,12 +210,9 @@ function renderHistory(){
      <div class="sumrow"><span>Desconto mensal (${Number((o.settings||settings).rate||settings.rate).toLocaleString('pt-BR')}%)</span><b>${money(d.monthly)}</b></div>
      <div class="sumrow"><span>IOF diário</span><b>${money(d.iofDaily)}</b></div>
      <div class="sumrow"><span>IOF adicional</span><b>${money(d.iofAdditional)}</b></div>
-     <div class="sumrow total"><span>Total descontado neste cheque</span><b>${money(d.total)}</b></div>
-     <div class="net-cheque">Líquido individual: ${money(d.net)}</div>
-     <div class="discount-breakdown operation-cost">
-    <div class="summary-label">Custo da operação (cobrado uma única vez)</div>
-    <div class="sumrow"><span>Envelope / TAC</span><b>${money(savedOperationTotals(o).tac)}</b></div>
-   </div>
+     ${tacForCheque>0?`<div class="sumrow"><span>Envelope / TAC (operação)</span><b>${money(tacForCheque)}</b></div>`:''}
+     <div class="sumrow total"><span>Total descontado ${o.cheques.length>1?'neste cheque':'nesta operação'}</span><b>${money(totalWithTac)}</b></div>
+     <div class="net-cheque">Líquido individual: ${money(netWithTac)}</div>
   </div>
     <div class="ch"><span>Situação</span><select data-id="${o.id}" data-i="${i}">${['aberto','compensado','devolvido'].map(s=>`<option value="${s}"${(c.status||'aberto')===s?' selected':''}>${s[0].toUpperCase()+s.slice(1)}</option>`).join('')}</select></div>
    </div>`}).join('')}

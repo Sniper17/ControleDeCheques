@@ -12,8 +12,8 @@ import android.os.Build;
 public class ReminderReceiver extends BroadcastReceiver {
     public static final String CHANNEL_ID = "cheque_due_reminders";
     @Override public void onReceive(Context context, Intent intent) {
-        String title = intent.getStringExtra("title");
-        if (title == null || title.trim().isEmpty()) title = "Cheque com vencimento hoje";
+        // Do not expose customer names or cheque amounts on the lock screen.
+        String title = "Há um cheque com vencimento hoje";
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (manager == null) return;
         if (Build.VERSION.SDK_INT >= 26) {
@@ -28,8 +28,8 @@ public class ReminderReceiver extends BroadcastReceiver {
             ? new Notification.Builder(context, CHANNEL_ID) : new Notification.Builder(context);
         builder.setSmallIcon(context.getApplicationInfo().icon)
             .setContentTitle("Cálculo de Cheques")
-            .setContentText(title)
-            .setStyle(new Notification.BigTextStyle().bigText(title + " — confira o recebimento."))
+            .setContentText("Abra o aplicativo para conferir os detalhes.")
+            .setStyle(new Notification.BigTextStyle().bigText("Abra o aplicativo para conferir os detalhes."))
             .setAutoCancel(true).setContentIntent(content).setPriority(Notification.PRIORITY_HIGH);
         manager.notify(intent.getIntExtra("notificationId", (int)System.currentTimeMillis()), builder.build());
     }

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -28,10 +27,21 @@ public class BootReceiver extends BroadcastReceiver {
         String raw = prefs.getString(KEY, "[]");
         try {
             JSONArray items = new JSONArray(raw);
+            JSONArray sanitized = new JSONArray();
             for (int i = 0; i < items.length(); i++) {
                 JSONObject item = items.getJSONObject(i);
-                schedule(context, item.optString("id"), item.optString("date"), item.optString("title"));
+                String id = item.optString("id");
+                String date = item.optString("date");
+                if (id.matches("[A-Za-z0-9_-]{1,100}") && date.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                    JSONObject safe = new JSONObject();
+                    safe.put("id", id);
+                    safe.put("date", date);
+                    safe.put("title", "Cheque com vencimento hoje");
+                    sanitized.put(safe);
+                    schedule(context, id, date, "Cheque com vencimento hoje");
+                }
             }
+            prefs.edit().putString(KEY, sanitized.toString()).apply();
         } catch (Exception ignored) { }
     }
 

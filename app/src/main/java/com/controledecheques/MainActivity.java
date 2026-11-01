@@ -14,6 +14,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebResourceRequest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
@@ -40,7 +41,11 @@ public class MainActivity extends Activity {
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(true);
+        settings.setJavaScriptCanOpenWindowsAutomatically(false);
+        settings.setSupportMultipleWindows(false);
+        if (Build.VERSION.SDK_INT >= 26) settings.setSafeBrowsingEnabled(true);
         settings.setAllowContentAccess(false);
+        settings.setBlockNetworkLoads(true);
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
@@ -48,7 +53,18 @@ public class MainActivity extends Activity {
         settings.setBuiltInZoomControls(false);
         WebView.setWebContentsDebuggingEnabled(false);
         web.addJavascriptInterface(new AndroidBridge(), "Android");
-        web.setWebViewClient(new WebViewClient());
+        web.setWebViewClient(new WebViewClient() {
+            private boolean allowed(Uri uri) {
+                return uri != null && "file".equals(uri.getScheme()) &&
+                    "/android_asset/index.html".equals(uri.getPath()) && uri.getHost() == null;
+            }
+            @Override public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return !allowed(Uri.parse(url));
+            }
+            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                return !allowed(request.getUrl());
+            }
+        });
         setContentView(web);
         web.loadUrl("file:///android_asset/index.html");
         BootReceiver.rescheduleAll(this);
@@ -69,7 +85,7 @@ public class MainActivity extends Activity {
     private void chooseRestoreFile() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
+        intent.setType("application/json");
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         startActivityForResult(intent, REQ_RESTORE_FILE);
     }
@@ -98,7 +114,10 @@ public class MainActivity extends Activity {
     private byte[] readAll(InputStream in) throws Exception {
         java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
         byte[] buffer = new byte[8192]; int n;
-        while ((n = in.read(buffer)) > 0) out.write(buffer, 0, n);
+        while ((n = in.read(buffer)) > 0) {
+            if (out.size() + n > 5 * 1024 * 1024) throw new Exception("Backup muito grande");
+            out.write(buffer, 0, n);
+        }
         return out.toByteArray();
     }
 
@@ -108,6 +127,7 @@ public class MainActivity extends Activity {
 
     private boolean writeBackup(String json) {
         try {
+            if (json == null || json.length() > 5 * 1024 * 1024) return false;
             String treeText = getSharedPreferences(BACKUP_PREFS, MODE_PRIVATE).getString(BACKUP_TREE, null);
             if (treeText == null) return false;
             Uri tree = Uri.parse(treeText);
@@ -138,6 +158,47 @@ public class MainActivity extends Activity {
     }
 
     private class AndroidBridge {
+        @JavascriptInterface public String secureGet(String key) {
+            if (!validStoreKey(key)) return null;
+            return SecureStore.get(MainActivity.this, key);
+        }
+        @JavascriptInterface public boolean secureHas(String key) {
+            return validStoreKey(key) && SecureStore.contains(MainActivity.this, key);
+        }
+        @JavascriptInterface public boolean secureSet(String key, String value) {
+            return validStoreKey(key) && SecureStore.put(MainActivity.this, key, value);
+        }
+        @JavascriptInterface public void secureRemove(String key) {
+            if (validStoreKey(key)) SecureStore.remove(MainActivity.this, key);
+        }
+        @JavascriptInterface public void clearSecureData() {
+            String savedTree = getSharedPreferences(BACKUP_PREFS, MODE_PRIVATE).getString(BACKUP_TREE, null);
+            if (savedTree != null) {
+                try { getContentResolver().releasePersistableUriPermission(Uri.parse(savedTree),
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION); }
+                catch (Exception ignored) { }
+            }
+            SharedPreferences reminderPrefs = getSharedPreferences(BootReceiver.PREFS, MODE_PRIVATE);
+            AlarmManager alarms = (AlarmManager) getSystemService(ALARM_SERVICE);
+            if (alarms != null) {
+                try {
+                    JSONArray items = new JSONArray(reminderPrefs.getString(BootReceiver.KEY, "[]"));
+                    for (int i=0; i<items.length(); i++) {
+                        String id = items.getJSONObject(i).optString("id");
+                        Intent intent = new Intent(MainActivity.this, ReminderReceiver.class);
+                        intent.setAction("com.controledecheques.REMINDER");
+                        PendingIntent pi = PendingIntent.getBroadcast(MainActivity.this, id.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                        alarms.cancel(pi);
+                    }
+                } catch (Exception ignored) { }
+            }
+            reminderPrefs.edit().clear().commit();
+            getSharedPreferences(BACKUP_PREFS, MODE_PRIVATE).edit().clear().commit();
+            SecureStore.clear(MainActivity.this);
+        }
+        private boolean validStoreKey(String key) {
+            return key != null && ("cc_settings".equals(key) || "cc_history".equals(key));
+        }
         @JavascriptInterface public boolean hasBackupFolder() {
             return getSharedPreferences(BACKUP_PREFS, MODE_PRIVATE).contains(BACKUP_TREE);
         }
@@ -168,7 +229,8 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface public void scheduleReminder(String id, String date, String title) {
-            if (id == null || date == null) return;
+            if (id == null || id.length() > 100 || !id.matches("[A-Za-z0-9_-]+") ||
+                date == null || !date.matches("\\d{4}-\\d{2}-\\d{2}")) return;
             SharedPreferences prefs = getSharedPreferences(BootReceiver.PREFS, MODE_PRIVATE);
             JSONArray old;
             try { old = new JSONArray(prefs.getString(BootReceiver.KEY, "[]")); }
@@ -180,11 +242,11 @@ public class MainActivity extends Activity {
                     if (!id.equals(item.optString("id"))) next.put(item);
                 }
                 JSONObject item = new JSONObject();
-                item.put("id", id); item.put("date", date); item.put("title", title == null ? "Cheque com vencimento hoje" : title);
+                item.put("id", id); item.put("date", date); item.put("title", "Cheque com vencimento hoje");
                 next.put(item);
                 prefs.edit().putString(BootReceiver.KEY, next.toString()).apply();
             } catch (Exception ignored) { }
-            BootReceiver.schedule(MainActivity.this, id, date, title);
+            BootReceiver.schedule(MainActivity.this, id, date, title == null ? null : title.substring(0, Math.min(title.length(), 120)));
         }
 
         @JavascriptInterface public void cancelReminder(String id) {

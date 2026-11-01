@@ -193,7 +193,7 @@ function renderHistory(){
  $('historyList').innerHTML=!list.length?'<div class="empty">'+(ops.length?'Nada encontrado.':'Nenhuma operação salva ainda.')+'</div>':list.map(o=>`
  <div class="history-item">
   <b>${br(o.date)}</b>${o.client?' • '+esc(o.client):''} <span class="pill">${o.cheques.length} cheque(s)</span>
-  <div class="muted">Cheques: ${money(savedOperationTotals(o).face)} • Descontos: ${money(savedOperationTotals(o).discounts)}</div>
+  <div class="muted">Cheques: ${money(savedOperationTotals(o).face)}</div>
   <b class="discount-total">Descontos: ${money(savedOperationTotals(o).discounts)}</b>
   <b class="liq">Líquido: ${money(savedOperationTotals(o).net)}</b>
   <div class="history-actions">

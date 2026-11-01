@@ -212,7 +212,11 @@ function renderHistory(){
      <div class="sumrow"><span>IOF adicional</span><b>${money(d.iofAdditional)}</b></div>
      <div class="sumrow total"><span>Total descontado neste cheque</span><b>${money(d.total)}</b></div>
      <div class="net-cheque">Líquido individual: ${money(d.net)}</div>
-    </div>
+     <div class="discount-breakdown operation-cost">
+    <div class="summary-label">Custo da operação (cobrado uma única vez)</div>
+    <div class="sumrow"><span>Envelope / TAC</span><b>${money(savedOperationTotals(o).tac)}</b></div>
+   </div>
+  </div>
     <div class="ch"><span>Situação</span><select data-id="${o.id}" data-i="${i}">${['aberto','compensado','devolvido'].map(s=>`<option value="${s}"${(c.status||'aberto')===s?' selected':''}>${s[0].toUpperCase()+s.slice(1)}</option>`).join('')}</select></div>
    </div>`}).join('')}
   </div>

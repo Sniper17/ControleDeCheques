@@ -175,14 +175,25 @@ function chequeBreakdownForSavedOperation(op,c){
  let daily=r2(base*(Number(cfg.iofDaily)||0)/100*Math.min(days,365)),additional=r2(base*(Number(cfg.iofExtra)||0)/100);
  return{days,monthly,iofDaily:daily,iofAdditional:additional,total:r2(monthly+daily+additional),net:r2(amount-monthly-daily-additional)};
 }
+function savedOperationTotals(op){
+ // Usa exatamente os valores por cheque já calculados/salvos, somando o TAC uma única vez.
+ const rows=(op.cheques||[]).map(c=>chequeBreakdownForSavedOperation(op,c));
+ const face=r2((op.cheques||[]).reduce((a,c)=>a+(Number(c.amount)||0),0));
+ const interest=r2(rows.reduce((a,d)=>a+(Number(d.monthly)||0),0));
+ const daily=r2(rows.reduce((a,d)=>a+(Number(d.iofDaily)||0),0));
+ const extra=r2(rows.reduce((a,d)=>a+(Number(d.iofAdditional)||0),0));
+ const tac=face>0?(Number((op.settings||{}).tac??defaults.tac)||0):0;
+ const discounts=r2(interest+daily+extra+tac);
+ return {face,interest,daily,extra,tac,discounts,net:r2(face-discounts)};
+}
 function renderHistory(){
  let q=$('q').value.trim().toLowerCase(),list=ops.filter(o=>!q||(o.client||'').toLowerCase().includes(q));
  renderTotals();$('clearHistory').classList.toggle('hidden',!ops.length);
  $('historyList').innerHTML=!list.length?'<div class="empty">'+(ops.length?'Nada encontrado.':'Nenhuma operação salva ainda.')+'</div>':list.map(o=>`
  <div class="history-item">
   <b>${br(o.date)}</b>${o.client?' • '+esc(o.client):''} <span class="pill">${o.cheques.length} cheque(s)</span>
-  <div class="muted">Cheques: ${money(o.face)} • Descontos: ${money(o.discounts)}</div>
-  <b class="liq">Líquido: ${money(o.net)}</b>
+  <div class="muted">Cheques: ${money(savedOperationTotals(o).face)} • Descontos: ${money(savedOperationTotals(o).discounts)}</div>
+  <b class="liq">Líquido: ${money(savedOperationTotals(o).net)}</b>
   <div class="history-actions">
    <button class="btn secondary" data-act="tg" data-id="${o.id}">Ver cheques</button>
    <button class="btn secondary" data-act="edit" data-id="${o.id}">Editar</button>
